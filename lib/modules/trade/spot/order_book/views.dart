@@ -71,20 +71,29 @@ class OrderBookView extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Consumer(
                   builder: (context, ref, child) {
-                    final ticker = ref.watch(currentTickerProvider);
-                    return Row(
-                      children: [
-                        Text(
-                          ticker.last,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: ticker.changePercentage > Decimal.zero
-                                ? Colors.red
-                                : Colors.green,
-                          ),
-                        ),
-                      ],
+                    return ref.watch(tickerStreamProvider).when(
+                      data: (data) {
+                        return Row(
+                          children: [
+                            Text(
+                              data.last,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: data.changePercentage > Decimal.zero
+                                    ? Colors.red
+                                    : Colors.green,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                      error: (error, stackTrace) {
+                        return const SizedBox.shrink();
+                      },
+                      loading: () {
+                        return const SizedBox.shrink();
+                      },
                     );
                   },
                 ),
@@ -100,8 +109,8 @@ class OrderBookView extends ConsumerWidget {
             ],
           );
         },
-        loading: () => const CircularProgressIndicator(),
-        error: (error, _) => Text('Error: $error'),
+        loading: () => const SizedBox.shrink(),
+        error: (error, _) => const SizedBox.shrink(),
       ),
     );
   }

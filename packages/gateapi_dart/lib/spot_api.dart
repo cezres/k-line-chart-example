@@ -21,4 +21,13 @@ abstract class SpotApi extends ApiClient {
   /// [withId] 是否返回深度更新 ID
   Future<OrderBook> orderBook(String currencyPair,
       {String? interval, int? limit, bool? withId});
+
+  /// 获取交易对的 K 线数据
+  /// [currencyPair] 交易对
+  /// [limit] 指定数据点的数量，适用于取最近 limit 数量的数据，该字段与 from, to 互斥，如果指定了 from, to 中的任意字段，该字段会被拒绝
+  /// [from] 指定 K 线图的起始时间，注意时间格式为秒(s)精度的 Unix 时间戳，不指定则默认为 to - 100 * interval，即向前最多 100 个点的时间
+  /// [to] 指定 K 线图的结束时间，不指定则默认当前时间，注意时间格式为秒(s)精度的 Unix 时间戳
+  /// [interval] 数据点的时间间隔， 注意 30d 代表的是自然月，不是按30天对齐
+  Future<List<List<String>>> candlesticks(String currencyPair,
+      {int? limit, int? from, int? to, String? interval});
 }

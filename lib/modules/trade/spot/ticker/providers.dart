@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:gateapi_dart/gateapi_dart.dart';
 import 'package:gateio_flutter/modules/trade/spot/currency_pair/providers.dart';
@@ -20,12 +19,10 @@ class TickerStream extends _$TickerStream {
       return;
     }
 
-    bool isCanceled = false;
-    ref.onCancel(() {
-      isCanceled = true;
-    });
+    bool isDisposed = false;
+    ref.onDispose(() => isDisposed = true);
 
-    while (!isCanceled) {
+    while (!isDisposed) {
       try {
         final result = await GateApi.spot.tickers(pair);
         if (result.isNotEmpty) {
@@ -34,61 +31,7 @@ class TickerStream extends _$TickerStream {
       } catch (e) {
         debugPrint('Error: $e');
       }
-      await Future.delayed(const Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 1));
     }
-  }
-}
-
-@Riverpod()
-class CurrentTicker extends _$CurrentTicker {
-  @override
-  Ticker build() {
-    final pair =
-        ref.watch(currentCurrencyPairProvider.select((value) => value?.id));
-    _fetchTicker(pair);
-
-    return Ticker(
-        currencyPair: pair ?? '',
-        last: '',
-        lowestAsk: '',
-        highestBid: '',
-        changePercentage: Decimal.zero,
-        baseVolume: Decimal.zero,
-        quoteVolume: Decimal.zero,
-        high24h: '',
-        low24h: '',
-        etfNetValue: '');
-  }
-
-  Timer? _timer;
-
-  void _fetchTicker(String? pair) {
-    _timer?.cancel();
-
-    if (pair == null) {
-      return;
-    }
-
-    final weakthis = WeakReference(this);
-    _timer = Timer.periodic(kTickerRefreshInterval, (timer) async {
-      final currentTicker = weakthis.target;
-      if (currentTicker != null) {
-        GateApi.spot.tickers(pair, timezone: Timezone.utc8).then((value) {
-          if (value.isEmpty) {
-            return;
-          }
-          final ticker = value.first;
-          if (ticker.currencyPair == currentTicker.state.currencyPair) {
-            currentTicker.state = value.first;
-          } else {
-            timer.cancel();
-          }
-        }).onError((error, stackTrace) {
-          debugPrint(error.toString());
-        });
-      } else {
-        timer.cancel();
-      }
-    });
   }
 }

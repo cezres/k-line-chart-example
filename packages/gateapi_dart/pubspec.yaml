@@ -13,6 +13,7 @@ dependencies:
 
   json_annotation: ^4.8.1
   dio: ^5.4.0
+  web_socket_channel: ^2.4.0
   decimal: ^2.3.3
 
 dev_dependencies:

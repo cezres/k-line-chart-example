@@ -34,4 +34,23 @@ final class SpotApiImpl extends SpotApi {
       },
     ).then((value) => OrderBook.fromJson(value));
   }
+
+  @override
+  Future<List<List<String>>> candlesticks(String currencyPair,
+      {int? limit, int? from, int? to, String? interval}) {
+    return dispatch(
+      '/spot/candlesticks',
+      params: {
+        'currency_pair': currencyPair,
+        'limit': limit,
+        'from': from,
+        'to': to,
+        'interval': interval,
+      },
+    ).then((value) {
+      return (value as List).map((e) {
+        return (e as List).map((e) => e.toString()).toList();
+      }).toList();
+    });
+  }
 }

@@ -47,6 +47,9 @@ dependencies:
   # UI
   fl_chart: ^0.66.2
 
+  # Net
+  web_socket_channel: ^2.4.0
+
 
   gateapi_dart:
     path: ./packages/gateapi_dart

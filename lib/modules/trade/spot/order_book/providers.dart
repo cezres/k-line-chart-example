@@ -12,23 +12,24 @@ class OrderBookStream extends _$OrderBookStream {
   Stream<OrderBook> build() async* {
     final pair = ref.watch(currentCurrencyPairProvider);
     if (pair == null) {
-      yield const OrderBook(id: 0, current: 0, update: 0, asks: [], bids: []);
       return;
     }
 
-    bool isCanceled = false;
-    ref.onCancel(() {
-      isCanceled = true;
-    });
+    bool isDisposed = false;
+    ref.onDispose(() => isDisposed = true);
 
-    while (!isCanceled) {
+    while (!isDisposed) {
       try {
-        yield await GateApi.spot
-            .orderBook(pair.id, interval: '1', limit: 10, withId: true);
+        yield await GateApi.spot.orderBook(
+          pair.id,
+          interval: '1',
+          limit: 10,
+          withId: true,
+        );
       } catch (e) {
         debugPrint('Error: $e');
       }
-      await Future.delayed(const Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 1));
     }
   }
 }

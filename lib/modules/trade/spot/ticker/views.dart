@@ -1,6 +1,7 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gateapi_dart/gateapi_dart.dart';
 import 'package:gateio_flutter/modules/trade/spot/ticker/providers.dart';
 import 'package:gateio_flutter/utils/format_decimal.dart';
 
@@ -9,7 +10,20 @@ class TickerView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ticker = ref.watch(currentTickerProvider);
+    return ref.watch(tickerStreamProvider).when(
+      data: (data) {
+        return _buildContent(data);
+      },
+      error: (error, stackTrace) {
+        return const SizedBox.shrink();
+      },
+      loading: () {
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildContent(Ticker ticker) {
     return Row(
       children: [
         _buildRowItem([

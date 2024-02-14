@@ -13,8 +13,8 @@ class Calculator {
   int addOne(int value) => value + 1;
 }
 
-// const String kBaseURL = 'https://api.gate.io/api/v4';
 const String kBaseURL = 'https://api.gateio.ws/api/v4';
+const String kWsURL = 'wss://api.gateio.ws/ws/v4/';
 
 final class GateApi {
   static SpotApi spot = SpotApiImpl();
