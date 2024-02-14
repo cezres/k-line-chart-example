@@ -1,0 +1,34 @@
+// ignore_for_file: constant_identifier_names
+
+import 'package:dio/dio.dart';
+import 'package:gateapi_dart/gateapi_dart.dart';
+
+final _kDio = Dio(
+  BaseOptions(
+    baseUrl: kBaseURL,
+  ),
+);
+
+class ApiClient {
+  ///
+  Future<dynamic> dispatch(
+    String path, [
+    ApiMethod method = ApiMethod.GET,
+    Map<String, dynamic>? params,
+  ]) async {
+    try {
+      final response = await _kDio.get(path, queryParameters: params);
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+}
+
+enum ApiMethod {
+  GET,
+  POST,
+  DELETE,
+  PUT,
+  PATCH,
+}
