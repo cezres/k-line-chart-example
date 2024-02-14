@@ -153,7 +153,7 @@ class CandlesticksView extends ConsumerWidget {
               showTitles: true,
               interval: interval.interval,
               getTitlesWidget: (value, meta) {
-                if (value == interval.min || value == interval.max) {
+                if (value == interval.min) {
                   return const SizedBox.shrink();
                 }
                 return Text(
