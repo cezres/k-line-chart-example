@@ -1,27 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'providers.dart';
+part of 'chart_data.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$kLineChartConfigurationHash() =>
-    r'074afc14b149f804625d1ff960ae8919dadab1fb';
+String _$chartDataLoaderHash() => r'1f31720a14230cd3086af759b4d42067b64ad609';
 
-/// See also [KLineChartConfiguration].
-@ProviderFor(KLineChartConfiguration)
-final kLineChartConfigurationProvider = NotifierProvider<
-    KLineChartConfiguration, KLineChartConfigurationEntity>.internal(
-  KLineChartConfiguration.new,
-  name: r'kLineChartConfigurationProvider',
+/// See also [ChartDataLoader].
+@ProviderFor(ChartDataLoader)
+final chartDataLoaderProvider =
+    StreamNotifierProvider<ChartDataLoader, ChartDataLoadedEntity>.internal(
+  ChartDataLoader.new,
+  name: r'chartDataLoaderProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$kLineChartConfigurationHash,
+      : _$chartDataLoaderHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$KLineChartConfiguration = Notifier<KLineChartConfigurationEntity>;
+typedef _$ChartDataLoader = StreamNotifier<ChartDataLoadedEntity>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

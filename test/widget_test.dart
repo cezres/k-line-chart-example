@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:gateio_flutter/main.dart';
+import 'package:gateio_flutter/modules/trade/spot/candlesticks/chart_data.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
@@ -26,5 +27,51 @@ void main() {
     // Verify that our counter has incremented.
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
+  });
+
+  test('list', () {
+    /// 合并两个正序并且数据连续的数组
+    /// 优先保留[list1]的数据
+    ///
+
+    expect(
+      ChartDataLoadedEntity.mergeSortedArrays(
+        [1, 2, 3, 4],
+        [5, 4],
+      ),
+      [1, 2, 3, 4, 5, 4],
+    );
+
+    expect(
+      ChartDataLoadedEntity.mergeSortedArrays(
+        [1, 2, 3, 4],
+        [5, 6],
+      ),
+      [1, 2, 3, 4, 5, 6],
+    );
+
+    expect(
+      ChartDataLoadedEntity.mergeSortedArrays(
+        [1, 2, 3, 4],
+        [5, 6, 7],
+      ),
+      [1, 2, 3, 4, 5, 6, 7],
+    );
+
+    expect(
+      ChartDataLoadedEntity.mergeSortedArrays(
+        [1, 2, 3, 4],
+        [0, 5, 6, 7, 8],
+      ),
+      [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    );
+
+    expect(
+      ChartDataLoadedEntity.mergeSortedArrays(
+        [1, 2, 3, 4],
+        [-4, 0, 5, 6, 7, 8, 9],
+      ),
+      [-4, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    );
   });
 }

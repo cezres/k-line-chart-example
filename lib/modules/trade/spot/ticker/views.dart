@@ -36,8 +36,7 @@ class TickerView extends ConsumerWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const Text(""),
-        ]),
+        ], minWidth: 80),
         _buildRowItem([
           _buildTitle('涨跌幅'),
           _buildValue(
@@ -46,7 +45,7 @@ class TickerView extends ConsumerWidget {
                 ? Colors.red
                 : Colors.green,
           ),
-        ]),
+        ], minWidth: 70),
         _buildRowItem([
           _buildTitle('24H 最高价'),
           _buildValue(ticker.high24h),
@@ -90,9 +89,10 @@ class TickerView extends ConsumerWidget {
     );
   }
 
-  Widget _buildRowItem(List<Widget> children) {
+  Widget _buildRowItem(List<Widget> children, {double? minWidth}) {
     return Container(
       padding: const EdgeInsets.only(right: 12),
+      constraints: minWidth != null ? BoxConstraints(minWidth: minWidth) : null,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,

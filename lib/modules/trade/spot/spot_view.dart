@@ -10,41 +10,35 @@ class SpotView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Column(
+    return const Column(
       children: [
-        const CurrencyPairView(),
-        const TickerView(),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              CurrencyPairView(),
               Expanded(
-                child: CandlesticksView(),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 12),
-                child: OrderBookView(),
+                child: TickerView(),
               ),
             ],
           ),
         ),
-        ElevatedButton(
-          onPressed: () {
-            //
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Scaffold(
-                  appBar: AppBar(
-                    title: const Text('data'),
-                  ),
-                  body: const OrderBookView(),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: CandlesticksView(),
                 ),
-              ),
-            );
-          },
-          child: const Text('data'),
+                Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: OrderBookView(),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

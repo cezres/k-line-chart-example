@@ -1,28 +1,31 @@
-import 'package:flutter/material.dart';
-import 'package:gateapi_dart/gateapi_dart.dart';
-import 'package:gateio_flutter/modules/trade/spot/currency_pair/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
 
-@Riverpod()
-class CandlesticksStream extends _$CandlesticksStream {
+@Riverpod(keepAlive: true)
+class KLineChartConfiguration extends _$KLineChartConfiguration {
   @override
-  Stream<List<List<String>>> build() async* {
-    final currencyPair = ref.watch(currentCurrencyPairProvider);
-    if (currencyPair == null) {
-      return;
-    }
+  KLineChartConfigurationEntity build() {
+    return const KLineChartConfigurationEntity();
+  }
 
-    try {
-      final data = await GateApi.spot.candlesticks(
-        currencyPair.id,
-        interval: '1h',
-        limit: 100,
-      );
-      yield data;
-    } catch (e) {
-      debugPrint('Error: $e');
-    }
+  void setInterval(String interval) {
+    state = state.copyWith(interval: interval);
+  }
+}
+
+final class KLineChartConfigurationEntity {
+  const KLineChartConfigurationEntity({
+    this.interval = '1h',
+  });
+
+  final String interval;
+
+  KLineChartConfigurationEntity copyWith({
+    String? interval,
+  }) {
+    return KLineChartConfigurationEntity(
+      interval: interval ?? this.interval,
+    );
   }
 }

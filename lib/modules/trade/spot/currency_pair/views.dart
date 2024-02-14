@@ -11,6 +11,15 @@ class CurrencyPairView extends ConsumerWidget {
     if (currencyPair == null) {
       return const SizedBox.shrink();
     }
-    return Text("${currencyPair.base}/${currencyPair.quote}");
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Text(
+        "${currencyPair.base}/${currencyPair.quote}",
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
   }
 }
