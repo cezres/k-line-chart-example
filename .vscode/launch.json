@@ -1,0 +1,45 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "gateio_flutter",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "gateio_flutter (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "gateio_flutter (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "gateapi_dart",
+            "cwd": "packages/gateapi_dart",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "gateapi_dart (profile mode)",
+            "cwd": "packages/gateapi_dart",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "gateapi_dart (release mode)",
+            "cwd": "packages/gateapi_dart",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

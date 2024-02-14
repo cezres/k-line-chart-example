@@ -6,16 +6,20 @@ import 'package:gateapi_dart/gateapi_dart.dart';
 final _kDio = Dio(
   BaseOptions(
     baseUrl: kBaseURL,
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
   ),
 );
 
 class ApiClient {
-  ///
+  /// 发送请求
   Future<dynamic> dispatch(
-    String path, [
+    String path, {
     ApiMethod method = ApiMethod.GET,
     Map<String, dynamic>? params,
-  ]) async {
+  }) async {
     try {
       final response = await _kDio.get(path, queryParameters: params);
       return response.data;

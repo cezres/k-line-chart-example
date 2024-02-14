@@ -1,5 +1,9 @@
 library gateapi_dart;
 
+export './types/currency_pair.dart';
+export './types/timezone.dart';
+export './types/ticker.dart';
+
 import 'package:gateapi_dart/impls/spot_api_impl.dart';
 import 'package:gateapi_dart/spot_api.dart';
 

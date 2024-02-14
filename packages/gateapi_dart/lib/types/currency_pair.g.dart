@@ -11,13 +11,13 @@ CurrencyPair _$CurrencyPairFromJson(Map<String, dynamic> json) => CurrencyPair(
       base: json['base'] as String,
       quote: json['quote'] as String,
       fee: json['fee'] as String,
-      minBaseAmount: json['min_base_amount'] as String,
-      minQuoteAmount: json['min_quote_amount'] as String,
-      maxBaseAmount: json['max_base_amount'] as String,
-      maxQuoteAmount: json['max_quote_amount'] as String,
+      minBaseAmount: json['min_base_amount'] as String?,
+      minQuoteAmount: json['min_quote_amount'] as String?,
+      maxBaseAmount: json['max_base_amount'] as String?,
+      maxQuoteAmount: json['max_quote_amount'] as String?,
       amountPrecision: json['amount_precision'] as int,
       precision: json['precision'] as int,
-      tradeStatus: json['trade_status'] as String,
+      tradeStatus: $enumDecode(_$TradeStatusEnumMap, json['trade_status']),
       sellStart: json['sell_start'] as int,
       buyStart: json['buy_start'] as int,
     );
@@ -34,7 +34,14 @@ Map<String, dynamic> _$CurrencyPairToJson(CurrencyPair instance) =>
       'max_quote_amount': instance.maxQuoteAmount,
       'amount_precision': instance.amountPrecision,
       'precision': instance.precision,
-      'trade_status': instance.tradeStatus,
+      'trade_status': _$TradeStatusEnumMap[instance.tradeStatus]!,
       'sell_start': instance.sellStart,
       'buy_start': instance.buyStart,
     };
+
+const _$TradeStatusEnumMap = {
+  TradeStatus.untradable: 'untradable',
+  TradeStatus.buyable: 'buyable',
+  TradeStatus.sellable: 'sellable',
+  TradeStatus.tradable: 'tradable',
+};

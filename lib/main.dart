@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gateapi_dart/gateapi_dart.dart';
+import 'package:gateio_flutter/modules/home/home_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,7 +23,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      // home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomePage(),
     );
   }
 }
@@ -34,13 +41,24 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  List<CurrencyPair> currencyPairs = [];
+
   void _incrementCounter() {
     setState(() {
       _counter++;
     });
 
-    GateApi.spot.currencyPairs().then((value) {
+    // GateApi.spot.currencyPairs().then((value) {
+    //   debugPrint(value.toString());
+    //   currencyPairs = value;
+    // }).onError((error, stackTrace) {
+    //   debugPrint(error.toString());
+    // });
+
+    GateApi.spot.tickers('ETH_USDT').then((value) {
       debugPrint(value.toString());
+
+      // final pair = value.firstWhere((element) => element.currencyPair == 'ETH_USDT');
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
     });
