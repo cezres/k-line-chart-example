@@ -6,7 +6,7 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tickerStreamHash() => r'7e2687dee74a03c73d451505848c9e9fb308fde3';
+String _$tickerStreamHash() => r'a6fc54290344507bbd1bba06f47bb9acb71f2c28';
 
 /// See also [TickerStream].
 @ProviderFor(TickerStream)

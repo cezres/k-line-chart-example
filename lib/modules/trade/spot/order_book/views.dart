@@ -1,7 +1,5 @@
-import 'dart:math';
-
 import 'package:decimal/decimal.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gateapi_dart/gateapi_dart.dart';
@@ -66,6 +64,7 @@ class OrderBookView extends ConsumerWidget {
                 width: 240,
                 height: 200,
                 priceColor: Colors.green,
+                reversedChart: true,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -104,7 +103,6 @@ class OrderBookView extends ConsumerWidget {
                 width: 240,
                 height: 200,
                 priceColor: Colors.red,
-                reversedChart: true,
               ),
             ],
           );
@@ -140,18 +138,10 @@ class _OrderBookChartView extends StatelessWidget {
       height: height,
       child: Stack(
         children: [
-          Positioned(
-            left: (width - height) / 2,
-            top: (height - width) / 2,
-            child: Transform.rotate(
-              angle: -pi / 2,
-              child: SizedBox(
-                width: height,
-                height: width,
-                child: _buildChart(
-                  height / data.length,
-                ),
-              ),
+          Positioned.fill(
+            child: CustomDepthChart(
+              values: data.map((e) => e[1].toDouble()).toList(),
+              reversed: reversedChart,
             ),
           ),
           Positioned.fill(
@@ -208,37 +198,75 @@ class _OrderBookChartView extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget _buildChart(double rowWidth) {
-    final List<BarChartGroupData> barGroups = [];
-    double value = 0;
-    for (var i = 0; i < data.length; i++) {
-      value += data[i][1].toDouble();
-      barGroups.add(
-        BarChartGroupData(
-          x: i,
-          barsSpace: 0,
-          barRods: [
-            BarChartRodData(
-              toY: value,
-              color: Colors.green[50],
-              width: rowWidth,
-              borderRadius: const BorderRadius.all(
-                Radius.zero,
-              ),
-            )
-          ],
-        ),
-      );
-    }
-    return BarChart(
-      BarChartData(
-        maxY: value,
-        gridData: const FlGridData(show: false),
-        borderData: FlBorderData(show: false),
-        titlesData: const FlTitlesData(show: false),
-        barGroups: reversedChart ? barGroups.reversed.toList() : barGroups,
+class CustomDepthChart extends ConsumerWidget {
+  const CustomDepthChart({
+    super.key,
+    required this.values,
+    required this.reversed,
+  });
+
+  final List<double> values;
+  final bool reversed;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return CustomPaint(
+      painter: CustomDepthChartPainter(
+        values: values,
+        reversed: reversed,
       ),
     );
+  }
+}
+
+class CustomDepthChartPainter extends CustomPainter {
+  const CustomDepthChartPainter({required this.values, required this.reversed});
+
+  final List<double> values;
+  final bool reversed;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.green[50]!
+      ..style = PaintingStyle.fill;
+
+    final double segmentHeight = size.height / values.length;
+
+    List<double> newValues = [];
+    double tempValue = 0;
+    for (var i = 0; i < values.length; i++) {
+      tempValue += values[i];
+      newValues.add(tempValue);
+    }
+    if (reversed) {
+      newValues = newValues.reversed.toList();
+    }
+    final double max = reversed ? newValues.first : newValues.last;
+
+    for (var i = 0; i < newValues.length; i++) {
+      final width = size.width * newValues[i] / max;
+      final x = size.width - width;
+      final rect = Rect.fromLTWH(
+        x,
+        i * segmentHeight,
+        width,
+        segmentHeight,
+      );
+      canvas.drawRect(rect, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    if (oldDelegate is CustomDepthChartPainter) {
+      if (reversed == oldDelegate.reversed &&
+          listEquals(values, oldDelegate.values)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -1,6 +1,6 @@
 {
-    "name": "gateio_flutter",
-    "short_name": "gateio_flutter",
+    "name": "K-line example",
+    "short_name": "K-line example",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

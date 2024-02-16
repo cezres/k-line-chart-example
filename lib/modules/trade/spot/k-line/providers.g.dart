@@ -7,7 +7,7 @@ part of 'providers.dart';
 // **************************************************************************
 
 String _$kLineChartConfigurationHash() =>
-    r'074afc14b149f804625d1ff960ae8919dadab1fb';
+    r'57966b2313beaf8e3da8976e49ad98cad203740a';
 
 /// See also [KLineChartConfiguration].
 @ProviderFor(KLineChartConfiguration)

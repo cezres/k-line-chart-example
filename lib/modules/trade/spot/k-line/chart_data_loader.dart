@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gateapi_dart/gateapi_dart.dart';
-import 'package:gateio_flutter/modules/trade/spot/candlesticks/providers.dart';
 import 'package:gateio_flutter/modules/trade/spot/currency_pair/providers.dart';
+import 'package:gateio_flutter/modules/trade/spot/k-line/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'chart_data.g.dart';
+part 'chart_data_loader.g.dart';
 
 @Riverpod(keepAlive: true)
 class ChartDataLoader extends _$ChartDataLoader {
@@ -33,12 +33,14 @@ class ChartDataLoader extends _$ChartDataLoader {
           currencyPair: currencyPair,
           interval: interval,
         );
+
         entity = entity.appendNewDatas(datas);
         yield entity;
+        return;
       } catch (e) {
         debugPrint('Error: $e');
       }
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(milliseconds: 600));
     }
   }
 
@@ -70,7 +72,7 @@ class ChartDataLoader extends _$ChartDataLoader {
       newDatas = await GateApi.spot.candlesticks(
         currencyPair,
         interval: interval,
-        limit: 100,
+        limit: 1000,
       );
     }
 
@@ -135,8 +137,10 @@ final class ChartDataLoadedEntity {
     );
   }
 
-  /// 合并两个正序并且数据连续的数组
+  /// 合并两个数据集
   /// 优先保留[list1]的数据
+  /// [list1] 必须是有序且数据连续的数据集
+  /// [list2] 必须是有序的数据集
   static List<T> mergeSortedArrays<T extends Comparable>(
       List<T> list1, List<T> list2) {
     if (list1.isEmpty) {

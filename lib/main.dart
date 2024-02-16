@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gateio_flutter/modules/home/home_page.dart';
 
-void main() {
+
+void main() async {
   runApp(
     const ProviderScope(
       child: MyApp(),

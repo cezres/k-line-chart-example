@@ -24,7 +24,8 @@ class TickerView extends ConsumerWidget {
   }
 
   Widget _buildContent(Ticker ticker) {
-    return Row(
+    return Wrap(
+      alignment: WrapAlignment.center,
       children: [
         _buildRowItem([
           Text(
