@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
 
 /// K线点绘制数据
 class KlinePointPaintData {
@@ -34,7 +35,9 @@ class KlinePointPaintData {
     }
 
     final x = displayX - segmentWidth / 2;
-    paint.color = closePriceY < openPriceY ? Colors.red : Colors.green;
+    paint.color = closePriceY < openPriceY
+        ? KlineConfigs.riseColor
+        : KlineConfigs.fallColor;
 
     paint.strokeWidth = segmentWidth - 1;
     canvas.drawLine(
@@ -43,16 +46,20 @@ class KlinePointPaintData {
       paint,
     );
 
-    canvas.drawLine(
-      Offset(x, size.height),
-      Offset(x, volumeY),
-      paint,
-    );
-
     paint.strokeWidth = 1;
     canvas.drawLine(
       Offset(x, highPriceY),
       Offset(x, lowPriceY),
+      paint,
+    );
+
+    paint.color = closePriceY < openPriceY
+        ? KlineConfigs.volumeRiseColor
+        : KlineConfigs.volumeFallColor;
+    paint.strokeWidth = segmentWidth - 1;
+    canvas.drawLine(
+      Offset(x, size.height),
+      Offset(x, volumeY),
       paint,
     );
   }

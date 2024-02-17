@@ -16,37 +16,18 @@ class KlineLastPaintData {
       return;
     }
 
-    final textPainter =
-        PaintCaches.putIfAbsent('last_line_text', [last, y], () {
-      final textSpan = TextSpan(
-        text: '$last',
-        style: const TextStyle(color: Colors.black, fontSize: 12),
-      );
-      final textPainter = TextPainter(
-        text: textSpan,
-        textDirection: TextDirection.ltr,
-      );
-      textPainter.layout(
-        minWidth: 0,
-        maxWidth: size.width,
-      );
-      return textPainter;
-    });
-
-    final textOffset = Offset(
-      size.width * 0.25,
-      y - textPainter.height / 2,
-    );
-
-    final rect = Rect.fromLTWH(
-      textOffset.dx - 4,
-      textOffset.dy - 2,
-      textPainter.width + 8,
-      textPainter.height + 4,
-    );
-    final textBackgroundRect = RRect.fromRectAndRadius(
-      rect,
-      const Radius.circular(4),
+    final rect = PaintCaches.paintText(
+      canvas: canvas,
+      paint: paint,
+      key: 'last_line_text',
+      text: last.toStringAsFixed(1),
+      offset: Offset(
+        size.width * 0.25,
+        y,
+      ),
+      style: const TextStyle(color: Colors.black, fontSize: 12),
+      backgroundColor: Colors.grey[300]!,
+      backgroundRadius: const Radius.circular(4),
     );
 
     final linePath = PaintCaches.putIfAbsent(
@@ -71,17 +52,6 @@ class KlineLastPaintData {
 
       return path;
     });
-
-    /// 绘制文本背景
-    paint.color = Colors.grey[300]!;
-    paint.style = PaintingStyle.fill;
-    canvas.drawRRect(textBackgroundRect, paint);
-
-    /// 绘制文本
-    textPainter.paint(
-      canvas,
-      textOffset,
-    );
 
     // 绘制虚线
     paint.color = Colors.red;

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gateio_flutter/widgets/kline/kline_controller.dart';
 import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
@@ -63,7 +65,7 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    final child = GestureDetector(
       onScaleStart: (details) {
         _velocity = null;
         _startOffset = details.localFocalPoint.dx;
@@ -86,6 +88,23 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
       },
       child: widget.child,
     );
+
+    if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+      return MouseRegion(
+        onEnter: (event) {
+          widget.controller.mouse(event.localPosition);
+        },
+        onHover: (event) {
+          widget.controller.mouse(event.localPosition);
+        },
+        onExit: (event) {
+          widget.controller.mouse(const Offset(-1, -1));
+        },
+        child: child,
+      );
+    } else {
+      return child;
+    }
   }
 
   bool setNewScrollOffset(double offset) {

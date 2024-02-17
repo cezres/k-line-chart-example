@@ -96,6 +96,12 @@ class KlineController {
     _streamController.add(_data);
   }
 
+  void mouse(Offset position) {
+    final newData = _data.copyWithMousePosition(position.dx, position.dy);
+    _data = newData;
+    _streamController.add(_data);
+  }
+
   void refresh() {
     _loader.request(
       offset: max(_data.displayOffset, 0),

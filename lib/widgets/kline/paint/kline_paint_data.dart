@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gateio_flutter/widgets/kline/calculator/calculator.dart';
 import 'package:gateio_flutter/widgets/kline/data/kline_data.dart';
 import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
+import 'package:gateio_flutter/widgets/kline/paint/floating_text_painter.dart';
 import 'package:gateio_flutter/widgets/kline/paint/kline_last_paint_data.dart';
+import 'package:gateio_flutter/widgets/kline/paint/kline_mouse_position_painter.dart';
 import 'package:gateio_flutter/widgets/kline/paint/kline_point_paint_data.dart';
 import 'package:gateio_flutter/widgets/kline/paint/right_titles.dart';
 
@@ -17,6 +19,8 @@ class KlinePaintData {
     required this.segmentWidth,
     required this.points,
     required this.last,
+    this.mousePositionX = 0,
+    this.mousePositionY = 0,
   })  : displayOffset = displayOffset ??
             calculateDisplayPointsOffset(
               segmentWidth,
@@ -47,6 +51,9 @@ class KlinePaintData {
   final List<KlinePointPaintData> points;
   final KlineLastPaintData last;
 
+  final double mousePositionX;
+  final double mousePositionY;
+
   KlinePaintData copyWith({
     KlineData? kline,
     int? displayOffset,
@@ -57,6 +64,8 @@ class KlinePaintData {
     double? segmentWidth,
     List<KlinePointPaintData>? points,
     KlineLastPaintData? last,
+    double? mousePositionX,
+    double? mousePositionY,
   }) {
     return KlinePaintData(
       kline: kline ?? this.kline,
@@ -68,6 +77,8 @@ class KlinePaintData {
       segmentWidth: segmentWidth ?? this.segmentWidth,
       points: points ?? this.points,
       last: last ?? this.last,
+      mousePositionX: mousePositionX ?? this.mousePositionX,
+      mousePositionY: mousePositionY ?? this.mousePositionY,
     );
   }
 
@@ -111,6 +122,13 @@ class KlinePaintData {
     return result;
   }
 
+  KlinePaintData copyWithMousePosition(double x, double y) {
+    return copyWith(
+      mousePositionX: x,
+      mousePositionY: y,
+    );
+  }
+
   /// 在数据变化时，重新计算对应的绘制数据
   /// 影响：K线点数据、画布尺寸、分段宽度
   KlinePaintData rebuildPointsAndLast() {
@@ -119,6 +137,7 @@ class KlinePaintData {
     /// 首个K线点数据距离最新数据的索引偏移
     final distance = kline.points.length - 1 + kline.offset;
 
+    final range = kline.valueRange;
     final minPrice = kline.valueRange.minPrice;
     final priceHeight = drawHeight * 0.7;
     final priceBaseY = drawHeight * 0.3;
@@ -152,27 +171,21 @@ class KlinePaintData {
       ));
     }
 
-    final last = kline.last;
-    final lastY = drawHeight - (priceBaseY + (last - minPrice) * priceYScale);
+    final lastClose = kline.last.close;
+    final double lastY;
+    if (lastClose < range.minPrice) {
+      lastY = priceHeight;
+    } else if (lastClose > range.maxPrice) {
+      lastY = 0;
+    } else {
+      lastY = drawHeight - (priceBaseY + (lastClose - minPrice) * priceYScale);
+    }
 
     return copyWith(
       points: list,
-      last: KlineLastPaintData(
-        last: last,
-        y: lastY,
-      ),
+      last: KlineLastPaintData(last: lastClose, y: lastY),
     );
   }
-
-  // /// 在数据变化时，重新计算对应的绘制数据
-  // /// 影响：K线点、画布尺寸、分段宽度
-  // static List<KlinePointPaintData> calculatePointDrawDatas({
-  //   required KlineData kline,
-  //   required double drawHeight,
-  //   required double segmentWidth,
-  // }) {
-  //   return list;
-  // }
 
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
@@ -199,5 +212,11 @@ class KlinePaintData {
 
     /// 绘制价格和交易量分割线
     KlineConfigs.paintPriceVolumeDivider(canvas, size, paint);
+
+    /// 绘制鼠标位置
+    KlineMousePositionPainter.paint(canvas, size, paint, this);
+
+    /// 绘制悬浮文字
+    KlineFloatingTextPainter.paint(canvas, size, paint, this);
   }
 }

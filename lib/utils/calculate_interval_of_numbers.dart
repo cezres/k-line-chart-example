@@ -12,10 +12,14 @@ IntervalOfNumbers calculateIntervalOfNumbers(
   }
   interval = interval.roundToDouble() * pow(x, exponent);
 
+  final maxValue = ((max / interval).floorToDouble() + 1) * interval;
+  final minValue = (min / interval).floorToDouble() * interval;
+
   return IntervalOfNumbers(
+    // interval: (maxValue - minValue) / segmentCount,
     interval: interval,
-    max: ((max / interval).floorToDouble() + 1) * interval,
-    min: (min / interval).floorToDouble() * interval,
+    max: maxValue,
+    min: minValue,
   );
 }
 

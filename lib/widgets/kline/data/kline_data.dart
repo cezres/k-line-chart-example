@@ -20,29 +20,38 @@ final class KlineData {
       currencyPair: '',
       interval: '',
       points: [],
-      last: 0,
+      last: KlinePoint(
+        timestamp: 0,
+        quoteVolume: 0,
+        close: 0,
+        high: 0,
+        low: 0,
+        open: 0,
+        baseVolume: 0,
+        isClose: false,
+      ),
       valueRange: const KlinePointsValueRange(),
     );
   }
 
-  factory KlineData.builder({
-    required int offset,
-    required int limit,
-    required String currencyPair,
-    required String interval,
-    required List<KlinePoint> points,
-  }) {
-    final last = points.isEmpty ? 0.0 : points.last.close;
-    return KlineData(
-      offset: offset,
-      limit: limit,
-      currencyPair: currencyPair,
-      interval: interval,
-      points: points,
-      last: last,
-      valueRange: KlinePointsValueRange.builder(points, last),
-    );
-  }
+  // factory KlineData.builder({
+  //   required int offset,
+  //   required int limit,
+  //   required String currencyPair,
+  //   required String interval,
+  //   required List<KlinePoint> points,
+  // }) {
+  //   final last = points.isEmpty ? 0.0 : points.last.close;
+  //   return KlineData(
+  //     offset: offset,
+  //     limit: limit,
+  //     currencyPair: currencyPair,
+  //     interval: interval,
+  //     points: points,
+  //     last: points.last,
+  //     valueRange: KlinePointsValueRange.builder(points, last),
+  //   );
+  // }
 
   /// 请求的起始位置，0表示最新的数据
   final int offset;
@@ -55,7 +64,7 @@ final class KlineData {
   final List<KlinePoint> points;
 
   /// 最新的价格
-  final double last;
+  final KlinePoint last;
 
   /// K线数据的值范围
   final KlinePointsValueRange valueRange;
@@ -126,8 +135,8 @@ final class KlinePointsValueRange {
   final double priceInterval;
   final double volumeInterval;
 
-  factory KlinePointsValueRange.builder(List<KlinePoint> points, double last) =>
-      calculateValueRangeWithKlinePoints(points, last);
+  factory KlinePointsValueRange.builder(List<KlinePoint> points) =>
+      calculateValueRangeWithKlinePoints(points);
 }
 
 /// K线数据范围

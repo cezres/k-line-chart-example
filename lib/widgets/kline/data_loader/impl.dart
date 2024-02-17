@@ -39,12 +39,23 @@ class KlineDataLoaderImpl extends KlineDataLoader {
 
   void _calculateKlineData({required int offset, required int limit}) {
     if (_totalPoints.isEmpty || limit == 0) {
-      _data = KlineData.builder(
+      _data = KlineData(
         offset: offset,
         limit: limit,
         currencyPair: kDefaultCurrencyPair,
         interval: kDefaultInterval,
         points: [],
+        valueRange: const KlinePointsValueRange(),
+        last: KlinePoint(
+          timestamp: 0,
+          quoteVolume: 0,
+          close: 0,
+          high: 0,
+          low: 0,
+          open: 0,
+          baseVolume: 0,
+          isClose: false,
+        ),
       );
       return;
     }
@@ -56,12 +67,16 @@ class KlineDataLoaderImpl extends KlineDataLoader {
       }
     }
 
-    _data = KlineData.builder(
+    final points = calculateDisplayPoints(_totalPoints, offset, limit);
+    final last = _totalPoints.last;
+    _data = KlineData(
       offset: offset,
       limit: limit,
       currencyPair: kDefaultCurrencyPair,
       interval: kDefaultInterval,
-      points: calculateDisplayPoints(_totalPoints, offset, limit),
+      points: points,
+      valueRange: KlinePointsValueRange.builder(points),
+      last: last,
     );
     _controller.add(_data);
   }

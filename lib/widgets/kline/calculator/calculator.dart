@@ -7,13 +7,13 @@ import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
 
 /// 计算一组K线点数据的最大价格、最小价格、最大成交量
 KlinePointsValueRange calculateValueRangeWithKlinePoints(
-    List<KlinePoint> points, double last) {
+    List<KlinePoint> points) {
   if (points.isEmpty) {
     return const KlinePointsValueRange();
   }
 
-  var maxPrice = last;
-  var minPrice = last;
+  var maxPrice = 0.0;
+  var minPrice = double.infinity;
   var maxVolume = 0.0;
   for (var element in points) {
     if (maxPrice < element.high) {
