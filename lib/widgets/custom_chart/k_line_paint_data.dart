@@ -6,19 +6,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'k_line_paint_data.g.dart';
 
-// @Riverpod(keepAlive: true)
-// KlinePaintDataState klinePaintData(KlinePaintDataRef ref) {
-//   final offset = ref.watch(
-//       customChartGestureDetectorProvider.select((value) => value.offset));
-//   final data = ref.watch(klineDataProvider);
-
-//   debugPrint('azusa - offset: $offset');
-
-//   return KlinePaintDataState(
-//     points: data.value?.points ?? [],
-//   );
-// }
-
 @Riverpod(keepAlive: true)
 class KlinePaintData extends _$KlinePaintData {
   @override

@@ -9,7 +9,7 @@ class KlineFloatingTextPainter {
       canvas: canvas,
       paint: paint,
       key: 'floating_text_volume_title',
-      text: '成交量(Volume)',
+      text: 'Volume',
       offset: Offset(20, size.height * (1 - KlineConfigs.volumeHeightRatio)),
       style: const TextStyle(color: Colors.grey, fontSize: 12),
     );
@@ -18,8 +18,9 @@ class KlineFloatingTextPainter {
       canvas: canvas,
       paint: paint,
       key: 'floating_text_price_title',
-      text: '开=                高=                 低=                 收=',
-      offset: const Offset(20, 20),
+      text:
+          'Open:                High:                 low:                 Close:',
+      offset: const Offset(10, 20),
       style: const TextStyle(
         color: Colors.grey,
         fontSize: 12,
@@ -27,7 +28,7 @@ class KlineFloatingTextPainter {
       ),
     );
 
-    var point = data.kline.points.last;
+    var point = data.kline.last;
     if (data.mousePositionX > 0 &&
         data.mousePositionX < size.width - KlineConfigs.rightTitlesWidth) {
       final distanceX = size.width - data.mousePositionX + data.scrollOffset;
@@ -35,7 +36,6 @@ class KlineFloatingTextPainter {
         final index =
             data.points.indexWhere((element) => element.distanceX < distanceX);
         point = data.kline.points[index];
-        debugPrint('distanceX: $distanceX - $index ${data.points.length}');
       }
     }
 
@@ -48,8 +48,8 @@ class KlineFloatingTextPainter {
       paint: paint,
       key: 'floating_text_price_value',
       text:
-          '${point.open}       ${point.high}        ${point.low}        ${point.close}',
-      offset: const Offset(20 + 22, 20),
+          '${point.open.toStringAsFixed(1)}           ${point.high.toStringAsFixed(1)}         ${point.low.toStringAsFixed(1)}             ${point.close.toStringAsFixed(1)}',
+      offset: const Offset(10 + 34, 20),
       style: TextStyle(
         color: color,
         fontSize: 12,
@@ -63,7 +63,7 @@ class KlineFloatingTextPainter {
       key: 'floating_text_volume_value',
       text: point.baseVolume.toString(),
       offset:
-          Offset(20 + 90, size.height * (1 - KlineConfigs.volumeHeightRatio)),
+          Offset(20 + 46, size.height * (1 - KlineConfigs.volumeHeightRatio)),
       style: TextStyle(
         color: color,
         fontSize: 12,

@@ -36,7 +36,6 @@ class _KlineViewState extends State<KlineView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    debugPrint('azusa - didChangeDependencies');
   }
 
   @override
@@ -45,7 +44,6 @@ class _KlineViewState extends State<KlineView> {
     if (oldWidget.size != widget.size) {
       _controller.resize(widget.size);
     }
-    // debugPrint('azusa - didUpdateWidget - ${context.size}');
   }
 
   @override

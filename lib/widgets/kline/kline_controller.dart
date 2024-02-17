@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gateio_flutter/widgets/kline/paint/kline_last_paint_data.dart';
 import 'package:gateio_flutter/widgets/kline/paint/kline_paint_data.dart';
@@ -115,12 +117,19 @@ class KlineController {
   /// 请求数据
   /// 多请求少量数据，以减少数据加载频率
   void _request(int offset, int limit, int oldOffset, int oldLimit) {
+    final int preload;
+    if (kIsWeb || Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+      preload = 20;
+    } else {
+      preload = 6;
+    }
+
     final offsetAbs = (offset - oldOffset).abs();
     final limitAbs = (limit - oldLimit).abs();
-    if (offsetAbs < 10 || limitAbs < 10) {
+    if (offsetAbs < preload / 2 || limitAbs < preload / 2) {
       _loader.request(
-        offset: max(offset - 20, 0),
-        limit: limit + 40,
+        offset: max(offset - preload, 0),
+        limit: limit + preload * 2,
         drawWidth: size.width,
         drawHeight: size.height,
         scrollOffset: _data.scrollOffset,

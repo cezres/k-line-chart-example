@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:gateio_flutter/widgets/kline/kline_controller.dart';
 import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
 
@@ -27,6 +30,7 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
   double _tempScrollOffset = 0;
 
   double _tempSegmentWidth = 0;
+  Offset? _tempTapDownPosition;
 
   double get segmentWidth => widget.controller.data.segmentWidth;
   set segmentWidth(double width) {
@@ -65,31 +69,63 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
 
   @override
   Widget build(BuildContext context) {
-    final child = GestureDetector(
-      onScaleStart: (details) {
-        _velocity = null;
-        _startOffset = details.localFocalPoint.dx;
-        _tempScrollOffset = scrollOffset;
-        _tempSegmentWidth = segmentWidth;
-        _controller.stop();
-      },
-      onScaleUpdate: (details) {
-        final offset = details.localFocalPoint.dx - _startOffset;
-        setNewScrollOffset(_tempScrollOffset + offset);
-        setNewSegmentWidth(_tempSegmentWidth * details.scale);
-      },
-      onScaleEnd: (details) {
-        _velocity = details.velocity.pixelsPerSecond.dx * 0.8;
-        if (_velocity != 0) {
-          _tempScrollOffset = scrollOffset;
-          _controller.reset();
-          _controller.animateTo(1, curve: Curves.easeOut);
+    void Function(TapDownDetails)? onTapDown;
+    void Function()? onTapUp;
+    if (kIsWeb) {
+      //
+    } else if (Platform.isIOS || Platform.isAndroid) {
+      onTapDown = (details) {
+        _tempTapDownPosition = details.localPosition;
+      };
+      onTapUp = () {
+        if (_tempTapDownPosition != null) {
+          widget.controller.mouse(_tempTapDownPosition!);
         }
-      },
-      child: widget.child,
+        _controller.stop();
+      };
+    }
+
+    final child = Listener(
+      onPointerSignal: kIsWeb
+          ? (event) {
+              if (event is PointerScrollEvent) {
+                setNewScrollOffset(scrollOffset + event.scrollDelta.dx);
+              }
+            }
+          : null,
+      child: GestureDetector(
+        onTap: onTapUp,
+        onTapDown: onTapDown,
+        onScaleStart: (details) {
+          _velocity = null;
+          _startOffset = details.localFocalPoint.dx;
+          _tempScrollOffset = scrollOffset;
+          _tempSegmentWidth = segmentWidth;
+          _controller.stop();
+          if (kIsWeb) {
+            //
+          } else if (Platform.isIOS || Platform.isAndroid) {
+            widget.controller.mouse(const Offset(-1, -1));
+          }
+        },
+        onScaleUpdate: (details) {
+          final offset = details.localFocalPoint.dx - _startOffset;
+          setNewScrollOffset(_tempScrollOffset + offset);
+          setNewSegmentWidth(_tempSegmentWidth * details.scale);
+        },
+        onScaleEnd: (details) {
+          _velocity = details.velocity.pixelsPerSecond.dx * 0.8;
+          if (_velocity != 0) {
+            _tempScrollOffset = scrollOffset;
+            _controller.reset();
+            _controller.animateTo(1, curve: Curves.easeOut);
+          }
+        },
+        child: widget.child,
+      ),
     );
 
-    if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+    if (kIsWeb || Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
       return MouseRegion(
         onEnter: (event) {
           widget.controller.mouse(event.localPosition);
