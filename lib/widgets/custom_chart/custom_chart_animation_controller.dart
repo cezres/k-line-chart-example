@@ -4,12 +4,12 @@ final class CustomChartAnimationController {
   CustomChartAnimationController();
 
   AnimationController? _controller;
-  CurvedAnimation? _animation;
+  // CurvedAnimation? _animation;
   void Function(double progress)? _listener;
 
   void stop() {
-    _animation?.removeListener(_listen);
-    _animation?.dispose();
+    // _animation?.removeListener(_listen);
+    // _animation?.dispose();
     _controller?.stop();
     // ignore: invalid_use_of_protected_member
     _controller?.clearListeners();

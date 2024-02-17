@@ -7,7 +7,7 @@ part of 'custom_chart_calculator.dart';
 // **************************************************************************
 
 String _$customChartCalculatorHash() =>
-    r'64fbc00eb4811cb37248bf50008ceb0de8af404c';
+    r'cc7e3aa88ec6127df49d8435f48f9cecab2ae2c1';
 
 /// See also [CustomChartCalculator].
 @ProviderFor(CustomChartCalculator)
@@ -24,7 +24,7 @@ final customChartCalculatorProvider =
 
 typedef _$CustomChartCalculator = Notifier<CustomChartData>;
 String _$customChartGestureDetectorHash() =>
-    r'84afd6e86b2d13750809524f279285692ad3fc2c';
+    r'5410907b0899f7d4bf3d646b34416e4d6b54da37';
 
 /// See also [CustomChartGestureDetector].
 @ProviderFor(CustomChartGestureDetector)

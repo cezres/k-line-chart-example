@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gateio_flutter/modules/home/home_page.dart';
 
+// flutter run -d chrome --web-renderer skwasm --release
+// flutter run -d chrome --web-renderer canvaskit --release
 
 void main() async {
   runApp(

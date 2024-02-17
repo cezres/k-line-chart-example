@@ -10,56 +10,56 @@ class SpotView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const kline = CustomChart();
-    const pair = CurrencyPairView();
-    const ticker = TickerView();
-    const depth = OrderBookView();
+    // const kline = CustomChart();
+    // const pair = CurrencyPairView();
+    // const ticker = TickerView();
+    // const depth = OrderBookView();
 
     final size = MediaQuery.of(context).size;
 
     if (size.width > 600) {
       return const Column(
         children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: 16),
-            child: Row(
-              children: [
-                pair,
-                Expanded(
-                  child: ticker,
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(child: kline),
-                Padding(
-                  padding: EdgeInsets.only(left: 20),
-                  child: depth,
-                ),
-              ],
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.only(bottom: 16),
+          //   child: Row(
+          //     children: [
+          //       pair,
+          //       Expanded(
+          //         child: ticker,
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // Expanded(
+          //   child: Row(
+          //     children: [
+          //       Expanded(child: kline),
+          //       Padding(
+          //         padding: EdgeInsets.only(left: 20),
+          //         child: depth,
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       );
     } else {
       return const Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          pair,
+          CurrencyPairView(),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
-            child: ticker,
+            child: TickerView(),
           ),
           AspectRatio(
             aspectRatio: 4 / 3,
-            child: kline,
+            child: CustomChart(),
           ),
           Padding(
             padding: EdgeInsets.only(top: 16),
-            child: depth,
+            child: OrderBookView(),
           ),
         ],
       );

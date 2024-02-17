@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gateio_flutter/modules/trade/spot/k-line/chart_data_loader.dart';
 import 'package:gateio_flutter/utils/merge_sorted_arrays.dart';
+import 'package:gateio_flutter/widgets/custom_chart/custom_chart.dart';
 import 'package:gateio_flutter/widgets/custom_chart/custom_chart_animation_controller.dart';
+import 'package:gateio_flutter/widgets/custom_chart/custom_chart_data.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'custom_chart_calculator.g.dart';
@@ -42,11 +44,11 @@ class CustomChartCalculator extends _$CustomChartCalculator {
     // } else {
     //   return const CustomChartData();
     // }
-    return const CustomChartData();
+    return CustomChartData();
   }
 
   void reset() {
-    state = const CustomChartData();
+    state = CustomChartData();
   }
 
   void setup({double? scale, double? offset, double? displayWidth}) {
@@ -79,8 +81,8 @@ class CustomChartCalculator extends _$CustomChartCalculator {
   }
 }
 
-class CustomChartData {
-  const CustomChartData({
+class CustomChartData extends Paintable {
+  CustomChartData({
     List<CustomChartGroupData> groups = const [],
     this.displayGroups = const [],
     this.scale = 1,
@@ -95,7 +97,25 @@ class CustomChartData {
     this.drawOffset = 0,
     this.distanceIndex,
     this.drawTag = 0,
+    this.last,
+    this.points = const [],
   }) : _groups = groups;
+
+  @override
+  void paint(Canvas canvas, Size size, Paint paint) {
+    // 绘制K线
+    for (var group in points) {
+      // group.paint(canvas, size, paint, 0, 0);
+    }
+
+    /// 绘制当前价格
+    if (last != null) {
+      last?.paint(canvas, size, paint);
+    }
+  }
+
+  final List<KLinePointChartData> points;
+  final KLineLastChartData? last;
 
   final List<CustomChartGroupData> _groups;
 
@@ -375,12 +395,14 @@ class CustomChartGestureDetector extends _$CustomChartGestureDetector {
     if (details.velocity.pixelsPerSecond.dx != 0) {
       final offset = state.offset;
       state.controller.run(controller, (progress) {
-        state = state.copyWith(
-          offset: max(
-            offset + progress * details.velocity.pixelsPerSecond.dx * 0.5,
-            0,
-          ),
-        );
+        final newOffset =
+            offset + progress * details.velocity.pixelsPerSecond.dx * 0.5;
+        if (newOffset < 0) {
+          state = state.copyWith(offset: 0);
+          state.controller.stop();
+        } else {
+          state = state.copyWith(offset: newOffset);
+        }
       });
     }
   }

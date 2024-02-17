@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gateio_flutter/widgets/custom_chart/custom_chart_calculator.dart';
+import 'package:gateio_flutter/widgets/custom_chart/k_line_calculator.dart';
 
 class CustomChart extends StatelessWidget {
   const CustomChart({
@@ -22,19 +23,39 @@ class CustomChart extends StatelessWidget {
               child: RepaintBoundary(
                 child: Consumer(
                   builder: (context, ref, child) {
-                    final calculator =
-                        ref.read(customChartCalculatorProvider.notifier);
-                    calculator.setup(
-                      displayWidth: constraints.maxWidth,
-                    );
-                    ref.watch(customChartCalculatorProvider
-                        .select((value) => value.drawTag));
+                    // final calculator =
+                    //     ref.read(customChartCalculatorProvider.notifier);
+                    // calculator.setup(
+                    //   displayWidth: constraints.maxWidth,
+                    // );
+                    // ref.watch(customChartCalculatorProvider
+                    //     .select((value) => value.drawTag));
 
-                    final state = ref.read(customChartCalculatorProvider);
-                    return CustomPaint(
-                      isComplex: true,
-                      willChange: true,
-                      painter: CustomChartPainter(state: state),
+                    // final state = ref.read(customChartCalculatorProvider);
+                    // return CustomPaint(
+                    //   isComplex: true,
+                    //   willChange: true,
+                    //   painter: CustomChartPainter(state: state),
+                    // );
+
+                    final calculator = ref.watch(kLineCalculatorProvider);
+                    calculator.setSize(
+                      constraints.maxWidth,
+                      constraints.maxHeight,
+                    );
+                    return StreamBuilder(
+                      stream: calculator.stream,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState !=
+                            ConnectionState.active) {
+                          return const SizedBox.shrink();
+                        }
+                        return CustomPaint(
+                          painter: CustomChartPainter(
+                            state: snapshot.requireData,
+                          ),
+                        );
+                      },
                     );
                   },
                 ),
@@ -46,6 +67,10 @@ class CustomChart extends StatelessWidget {
       ),
     );
   }
+}
+
+abstract class Paintable {
+  void paint(Canvas canvas, Size size, Paint paint);
 }
 
 class CustomChartPainter extends CustomPainter {
@@ -93,7 +118,7 @@ class CustomChartPainter extends CustomPainter {
     paint.strokeWidth = 1;
     canvas.drawLine(
       Offset(0, size.height * 0.725),
-      Offset(size.width, size.height * 0.70),
+      Offset(size.width, size.height * 0.725),
       paint,
     );
 
@@ -121,98 +146,21 @@ class CustomChartPainter extends CustomPainter {
       }
 
       /// 绘制成交量
-      final volumeMaxY = group.volumeRod.maxY * volumeYScale;
-      paint.strokeWidth = max(segmentWidth, 1).floorToDouble();
-      canvas.drawLine(
-        Offset(x, size.height),
-        Offset(x, size.height - volumeMaxY),
-        paint,
-      );
+      // final volumeMaxY = group.volumeRod.maxY * volumeYScale;
+      // paint.strokeWidth = max(segmentWidth, 1).floorToDouble();
+      // canvas.drawLine(
+      //   Offset(x, size.height),
+      //   Offset(x, size.height - volumeMaxY),
+      //   paint,
+      // );
     }
 
-    /// 绘制当前价格
-    _drawLastPrice(
-      canvas,
-      size,
-      paint,
-      priceYScale: priceYScale,
-      priceBaseY: priceBaseY,
-    );
+    state.paint(canvas, size, paint);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
-  }
-
-  void _drawLastPrice(
-    Canvas canvas,
-    Size size,
-    Paint paint, {
-    required double priceYScale,
-    required double priceBaseY,
-  }) {
-    if (state.lastPrice == 0) {
-      return;
-    }
-    final lastPriceY =
-        (state.lastPrice - state.minDisplayPrice) * priceYScale + priceBaseY;
-
-    final textSpan = TextSpan(
-      text: '${state.lastPrice}',
-      style: const TextStyle(color: Colors.black, fontSize: 12),
-    );
-
-    final textPainter = TextPainter(
-      text: textSpan,
-      textDirection: TextDirection.ltr,
-    );
-
-    textPainter.layout(
-      minWidth: 0,
-      maxWidth: size.width,
-    );
-
-    final textOffset = Offset(
-      size.width * 0.25,
-      size.height - lastPriceY - textPainter.height / 2,
-    );
-
-    /// 绘制文本背景
-    paint.color = Colors.grey[200]!;
-    final rect = Rect.fromLTWH(
-      textOffset.dx - 4,
-      textOffset.dy - 2,
-      textPainter.width + 8,
-      textPainter.height + 4,
-    );
-    canvas.drawRRect(
-        RRect.fromRectAndRadius(rect, const Radius.circular(4)), paint);
-
-    /// 绘制文本
-    textPainter.paint(
-      canvas,
-      textOffset,
-    );
-
-    // 绘制虚线
-    paint.color = Colors.red;
-    paint.strokeWidth = 1;
-    const dashWidth = 2.0;
-    const dashSpace = 2.0;
-    double startX = 0;
-    while (startX < size.width) {
-      if (startX > (rect.left - 4) && (startX + dashWidth) < (rect.right + 4)) {
-        startX += dashWidth + dashSpace;
-        continue;
-      }
-      canvas.drawLine(
-        Offset(startX, size.height - lastPriceY),
-        Offset(startX + dashWidth, size.height - lastPriceY),
-        paint,
-      );
-      startX += dashWidth + dashSpace;
-    }
   }
 }
 
@@ -262,6 +210,15 @@ class _CustomChartGestureDetectorState
       onPanEnd: (details) {
         gestureDetector.onPanEnd(details, _controller);
       },
+      // onScaleStart: (details) {
+      //   debugPrint('onScaleStart');
+      // },
+      // onScaleUpdate: (details) {
+      //   debugPrint('onScaleUpdate - ${details.scale}');
+      // },
+      // onScaleEnd: (details) {
+      //   debugPrint('onScaleEnd');
+      // },
       // child: const ChartScrollControl(),
     );
   }

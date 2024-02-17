@@ -14,9 +14,9 @@ List<T> mergeSortedArrays<T extends Comparable>(List<T> list1, List<T> list2) {
   final smaller = <T>[];
 
   for (var element in list2) {
-    if (element.compareTo(list1.first) > 0) {
+    if (element.compareTo(list1.last) > 0) {
       larger.add(element);
-    } else if (element.compareTo(list1.last) < 0) {
+    } else if (element.compareTo(list1.first) < 0) {
       smaller.add(element);
     }
   }
