@@ -11,7 +11,7 @@ $ flutter pub get
 $ flutter run
 ```
 
-### 截图
+### 截图 (Desktop、Web)
 
 ![img](https://github.com/cezres/K-line-chart-example/blob/main/assets/desktop.png)
 ![img](https://github.com/cezres/K-line-chart-example/blob/main/assets/web.png)
