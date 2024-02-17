@@ -42,6 +42,9 @@ class _KlineViewState extends State<KlineView> {
   @override
   void didUpdateWidget(covariant KlineView oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.size != widget.size) {
+      _controller.resize(widget.size);
+    }
     // debugPrint('azusa - didUpdateWidget - ${context.size}');
   }
 
@@ -54,20 +57,30 @@ class _KlineViewState extends State<KlineView> {
   @override
   Widget build(BuildContext context) {
     return KlineGestureDetector(
-      willChangeScrollOffset: (offset) {
+      controller: _controller,
+      willChangeScroll: (offset) {
         return _controller.willScroll(offset);
       },
-      onChangedScrollOffset: (offset) {
+      onChangedScroll: (offset) {
         _controller.scroll(offset);
       },
-      child: StreamBuilder(
-        initialData: _controller.data,
-        stream: _controller.stream,
-        builder: (context, snapshot) => CustomPaint(
-          willChange: true,
-          size: widget.size,
-          painter: KlinePainter(
-            data: snapshot.requireData,
+      willChangeScale: (scale) {
+        // return _controller.willScale(scale);
+        return false;
+      },
+      onChangedScale: (scale) {
+        // _controller.scale(scale);
+      },
+      child: RepaintBoundary(
+        child: StreamBuilder(
+          initialData: _controller.data,
+          stream: _controller.stream,
+          builder: (context, snapshot) => CustomPaint(
+            willChange: true,
+            size: widget.size,
+            painter: KlinePainter(
+              data: snapshot.requireData,
+            ),
           ),
         ),
       ),

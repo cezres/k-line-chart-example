@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:gateio_flutter/widgets/kline/kline_controller.dart';
 
 class KlineGestureDetector extends StatefulWidget {
   const KlineGestureDetector({
     super.key,
+    required this.controller,
     required this.child,
-    required this.willChangeScrollOffset,
-    required this.onChangedScrollOffset,
+    required this.willChangeScroll,
+    required this.onChangedScroll,
+    required this.willChangeScale,
+    required this.onChangedScale,
   });
 
-  final bool Function(double offset) willChangeScrollOffset;
-  final void Function(double offset) onChangedScrollOffset;
+  final bool Function(double offset) willChangeScroll;
+  final bool Function(double scale) willChangeScale;
+  final void Function(double offset) onChangedScroll;
+  final void Function(double scale) onChangedScale;
+
+  final KlineController controller;
   final Widget child;
 
   @override
@@ -24,7 +32,10 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
   double _startOffset = 0;
   double _tempScrollOffset = 0;
 
-  double scrollOffset = 0;
+  double get scrollOffset => widget.controller.data.scrollOffset;
+  set scrollOffset(double offset) {
+    widget.controller.scroll(offset);
+  }
 
   @override
   void initState() {
@@ -54,17 +65,22 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onPanStart: (details) {
+      onTap: () {
+        debugPrint('azusa - onTap');
+      },
+      onScaleStart: (details) {
+        // debugPrint("${details.pointerCount} - ${details.localFocalPoint.dx}");
         _velocity = null;
-        _startOffset = details.globalPosition.dx;
+        _startOffset = details.localFocalPoint.dx;
         _tempScrollOffset = scrollOffset;
         _controller.stop();
       },
-      onPanUpdate: (details) {
-        final offset = details.globalPosition.dx - _startOffset;
+      onScaleUpdate: (details) {
+        debugPrint("${details.pointerCount} - ${details.scale}");
+        final offset = details.localFocalPoint.dx - _startOffset;
         setNewScrollOffset(_tempScrollOffset + offset);
       },
-      onPanEnd: (details) {
+      onScaleEnd: (details) {
         _velocity = details.velocity.pixelsPerSecond.dx * 0.8;
         if (_velocity != 0) {
           _tempScrollOffset = scrollOffset;
@@ -77,9 +93,9 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
   }
 
   bool setNewScrollOffset(double offset) {
-    if (widget.willChangeScrollOffset(offset)) {
+    if (widget.willChangeScroll(offset)) {
       scrollOffset = offset;
-      widget.onChangedScrollOffset(scrollOffset);
+      // widget.onChangedScroll(scrollOffset);
       return true;
     }
     return false;

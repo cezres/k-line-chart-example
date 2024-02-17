@@ -36,9 +36,9 @@ class KlineRightTitlesPainter {
     for (var i = 1; i < KlinePaintConfigs.priceSegmentCount; i++) {
       final price = range.maxPrice - range.priceInterval * i;
       final textPainter =
-          PaintCaches.putIfAbsent('titles_price_painter_$i', price, (value) {
+          PaintCaches.putIfAbsent('titles_price_painter_$i', price, () {
         final textSpan = TextSpan(
-          text: value.toStringAsFixed(1),
+          text: price.toStringAsFixed(1),
           style: TextStyle(color: Colors.grey[600]!, fontSize: 12),
         );
         final textPainter =
@@ -64,9 +64,9 @@ class KlineRightTitlesPainter {
     for (var i = 0; i < KlinePaintConfigs.volumeSegmentCount; i++) {
       final volume = range.maxVolume - range.volumeInterval * i;
       final textPainter =
-          PaintCaches.putIfAbsent('titles_volume_painter_$i', volume, (value) {
+          PaintCaches.putIfAbsent('titles_volume_painter_$i', volume, () {
         final textSpan = TextSpan(
-          text: value.toStringAsFixed(0),
+          text: volume.toStringAsFixed(0),
           style: TextStyle(color: Colors.grey[600]!, fontSize: 12),
         );
         final textPainter =

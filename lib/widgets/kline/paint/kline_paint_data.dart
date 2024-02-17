@@ -75,27 +75,7 @@ class KlinePaintData {
     if (kline.points.isEmpty) {
       return this;
     }
-
-    final minPrice = kline.valueRange.minPrice;
-    final priceHeight = drawHeight * 0.7;
-    final priceBaseY = drawHeight * 0.3;
-    final priceYScale = priceHeight / kline.valueRange.priceRange;
-
-    final last = kline.last;
-    final lastY = drawHeight - (priceBaseY + (last - minPrice) * priceYScale);
-
-    return copyWith(
-      kline: kline,
-      points: calculatePointDrawDatas(
-        kline: kline,
-        drawHeight: drawHeight,
-        segmentWidth: segmentWidth,
-      ),
-      last: KlineLastPaintData(
-        last: last,
-        y: lastY,
-      ),
-    );
+    return copyWith(kline: kline).rebuildPointsAndLast();
   }
 
   KlinePaintData copyWithScrollOffset(double scrollOffset) {
@@ -105,13 +85,35 @@ class KlinePaintData {
     );
   }
 
+  KlinePaintData copyWithSegmentWidth(double segmentWidth) {
+    return copyWith(
+      segmentWidth: segmentWidth,
+      // displayOffset: calculateDisplayPointsOffset(segmentWidth, scrollOffset),
+      displayLimit: calculateDisplayPointsLimit(segmentWidth, drawWidth),
+    ).rebuildPointsAndLast();
+  }
+
+  KlinePaintData copyWithDrawSize(double drawWidth, double drawHeight) {
+    var result = this;
+    if (drawHeight != this.drawHeight) {
+      result = result
+          .copyWith(
+            drawHeight: drawHeight,
+          )
+          .rebuildPointsAndLast();
+    }
+    if (result.drawWidth != drawWidth) {
+      result = result.copyWith(
+        drawWidth: drawWidth,
+        displayLimit: calculateDisplayPointsLimit(segmentWidth, drawWidth),
+      );
+    }
+    return result;
+  }
+
   /// 在数据变化时，重新计算对应的绘制数据
-  /// 影响：K线点、画布尺寸、分段宽度
-  static List<KlinePointPaintData> calculatePointDrawDatas({
-    required KlineData kline,
-    required double drawHeight,
-    required double segmentWidth,
-  }) {
+  /// 影响：K线点数据、画布尺寸、分段宽度
+  KlinePaintData rebuildPointsAndLast() {
     final points = kline.points;
 
     /// 首个K线点数据距离最新数据的索引偏移
@@ -149,8 +151,28 @@ class KlinePaintData {
         volumeY: volumeY,
       ));
     }
-    return list;
+
+    final last = kline.last;
+    final lastY = drawHeight - (priceBaseY + (last - minPrice) * priceYScale);
+
+    return copyWith(
+      points: list,
+      last: KlineLastPaintData(
+        last: last,
+        y: lastY,
+      ),
+    );
   }
+
+  // /// 在数据变化时，重新计算对应的绘制数据
+  // /// 影响：K线点、画布尺寸、分段宽度
+  // static List<KlinePointPaintData> calculatePointDrawDatas({
+  //   required KlineData kline,
+  //   required double drawHeight,
+  //   required double segmentWidth,
+  // }) {
+  //   return list;
+  // }
 
   void paint(Canvas canvas, Size size) {
     final paint = Paint()

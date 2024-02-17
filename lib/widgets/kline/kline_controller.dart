@@ -68,20 +68,52 @@ class KlineController {
   void scroll(double scrollOffset) {
     if (scrollOffset != _data.scrollOffset) {
       final newData = _data.copyWithScrollOffset(scrollOffset);
+      _request(
+        newData.displayOffset,
+        newData.displayLimit,
+        _data.displayOffset,
+        _data.displayLimit,
+      );
 
-      /// 降低数据加载频率
-      final dataOffset = max(_data.displayOffset - 20, 0);
-      if ((dataOffset - _data.kline.offset).abs() > 10) {
-        _loader.request(
-          offset: dataOffset,
-          limit: newData.displayLimit + 40,
-          drawWidth: size.width,
-          drawHeight: size.height,
-          scrollOffset: scrollOffset,
-        );
-      }
       _data = newData;
       _streamController.add(_data);
+    }
+  }
+
+  void setSegmentWidth(double width) {
+    final newData = _data.copyWithSegmentWidth(width);
+    _data = newData;
+    _streamController.add(_data);
+  }
+
+  void resize(Size size) {
+    debugPrint('azusa - resize - $size');
+    // return;
+    final newData = _data.copyWithDrawSize(size.width, size.height);
+    _request(
+      newData.displayOffset,
+      newData.displayLimit,
+      _data.displayOffset,
+      _data.displayLimit,
+    );
+
+    _data = newData;
+    _streamController.add(_data);
+  }
+
+  /// 请求数据
+  /// 多请求少量数据，以减少数据加载频率
+  void _request(int offset, int limit, int oldOffset, int oldLimit) {
+    final offsetAbs = (offset - oldOffset).abs();
+    final limitAbs = (limit - oldLimit).abs();
+    if (offsetAbs < 10 || limitAbs < 10) {
+      _loader.request(
+        offset: max(offset - 20, 0),
+        limit: limit + 40,
+        drawWidth: size.width,
+        drawHeight: size.height,
+        scrollOffset: _data.scrollOffset,
+      );
     }
   }
 }

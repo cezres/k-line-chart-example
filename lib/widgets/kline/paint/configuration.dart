@@ -42,13 +42,12 @@ class PaintCaches {
   static final Map<String, dynamic> values = {};
   static final Map<String, dynamic> caches = {};
 
-  static T putIfAbsent<T, V>(
-      String key, V value, T Function(V value) ifAbsent) {
+  static T putIfAbsent<T, V>(String key, V value, T Function() ifAbsent) {
     if (values[key] == value) {
       // debugPrint('hit cache: $key');
       return caches[key] as T;
     }
-    final result = ifAbsent(value);
+    final result = ifAbsent();
     values[key] = value;
     caches[key] = result;
     return result;

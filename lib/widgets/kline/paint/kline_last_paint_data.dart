@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gateio_flutter/widgets/kline/paint/configuration.dart';
 
 /// K线最新数据和绘制信息
 class KlineLastPaintData {
@@ -10,49 +11,46 @@ class KlineLastPaintData {
   final double last;
   final double y;
 
-  /// 缓存，需要在主 Isolate 中执行
-  TextPainter? _textPainter;
-  Offset? _textOffset;
-  RRect? _textBackgroundRect;
-  Path? _linePath;
-
   void paint(Canvas canvas, Size size, Paint paint) {
     if (last == 0 || size.isEmpty) {
       return;
     }
 
-    if (_textPainter == null) {
+    final textPainter =
+        PaintCaches.putIfAbsent('last_line_text', [last, y], () {
       final textSpan = TextSpan(
         text: '$last',
         style: const TextStyle(color: Colors.black, fontSize: 12),
       );
-
-      _textPainter = TextPainter(
+      final textPainter = TextPainter(
         text: textSpan,
         textDirection: TextDirection.ltr,
       );
-
-      _textPainter!.layout(
+      textPainter.layout(
         minWidth: 0,
         maxWidth: size.width,
       );
+      return textPainter;
+    });
 
-      _textOffset = Offset(
-        size.width * 0.25,
-        y - _textPainter!.height / 2,
-      );
+    final textOffset = Offset(
+      size.width * 0.25,
+      y - textPainter.height / 2,
+    );
 
-      final rect = Rect.fromLTWH(
-        _textOffset!.dx - 4,
-        _textOffset!.dy - 2,
-        _textPainter!.width + 8,
-        _textPainter!.height + 4,
-      );
-      _textBackgroundRect = RRect.fromRectAndRadius(
-        rect,
-        const Radius.circular(4),
-      );
+    final rect = Rect.fromLTWH(
+      textOffset.dx - 4,
+      textOffset.dy - 2,
+      textPainter.width + 8,
+      textPainter.height + 4,
+    );
+    final textBackgroundRect = RRect.fromRectAndRadius(
+      rect,
+      const Radius.circular(4),
+    );
 
+    final linePath = PaintCaches.putIfAbsent(
+        'last_line_path', Object.hashAll([y, size.width]), () {
       const dashWidth = 2.0;
       const dashSpace = 2.0;
       double startX = 0;
@@ -71,24 +69,24 @@ class KlineLastPaintData {
         startX += dashWidth + dashSpace;
       }
 
-      _linePath = path;
-    }
+      return path;
+    });
 
     /// 绘制文本背景
     paint.color = Colors.grey[300]!;
     paint.style = PaintingStyle.fill;
-    canvas.drawRRect(_textBackgroundRect!, paint);
+    canvas.drawRRect(textBackgroundRect, paint);
 
     /// 绘制文本
-    _textPainter!.paint(
+    textPainter.paint(
       canvas,
-      _textOffset!,
+      textOffset,
     );
 
     // 绘制虚线
     paint.color = Colors.red;
     paint.strokeWidth = 1;
     paint.style = PaintingStyle.stroke;
-    canvas.drawPath(_linePath!, paint);
+    canvas.drawPath(linePath, paint);
   }
 }
