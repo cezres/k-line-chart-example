@@ -8,7 +8,7 @@ class TradeView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16),
       // child: SpotView(),
       child: LayoutBuilder(
         builder: (context, constraints) => DecoratedBox(

@@ -1,28 +1,43 @@
-import 'package:gateio_flutter/widgets/kline/data/kline_data.dart';
-import 'package:gateio_flutter/widgets/kline/data_loader/data_loader.dart';
+import 'dart:convert';
 
-class WebKlineDataLoaderImpl extends KlineDataLoader {
-  @override
-  // TODO: implement data
-  KlineData get data => throw UnimplementedError();
+import 'package:flutter/services.dart';
+import 'package:gateio_flutter/widgets/kline/data_loader/impl.dart';
+
+class WebKlineDataLoaderImpl extends KlineDataLoaderImpl {
+  int _index = 0;
 
   @override
-  void dispose() {
-    // TODO: implement dispose
+  void loadLast() async {
+    final datas = await _loadDatasFromAsset('assets/candlesticks_0.json');
+    appendLastPoints(datas);
   }
 
-  @override
-  void request({
-    required int offset,
-    required int limit,
-    required double drawWidth,
-    required double drawHeight,
-    required double scrollOffset,
-  }) {
-    // TODO: implement request
-  }
+  bool _loadingFirst = false;
 
   @override
-  // TODO: implement stream
-  Stream<KlineData> get stream => throw UnimplementedError();
+  void loadFirst() async {
+    if (_loadingFirst) {
+      return;
+    }
+    _loadingFirst = true;
+    if (_index == 2) {
+      return;
+    }
+
+    _index++;
+
+    final datas = await _loadDatasFromAsset('assets/candlesticks_$_index.json');
+    appendFirstPoints(datas);
+    _loadingFirst = false;
+  }
+
+  Future<List<List<String>>> _loadDatasFromAsset(String key) async {
+    final result =
+        await rootBundle.loadString('assets/candlesticks_$_index.json');
+    final datas = json.decode(result);
+
+    return (datas as List)
+        .map((e) => (e as List).map((e) => e.toString()).toList())
+        .toList();
+  }
 }

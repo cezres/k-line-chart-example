@@ -6,6 +6,9 @@ List<T> mergeSortedArrays<T extends Comparable>(List<T> list1, List<T> list2) {
   if (list1.isEmpty) {
     return list2;
   }
+  if (list2.isEmpty) {
+    return list1;
+  }
 
   /// list2中比list1大的数据
   final larger = <T>[];

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gateio_flutter/widgets/kline/painter/kline_draw_data.dart';
+import 'package:gateio_flutter/widgets/kline/paint/kline_paint_data.dart';
 import 'package:gateio_flutter/widgets/kline/kline_controller.dart';
 import 'package:gateio_flutter/widgets/kline/kline_gesture_detector.dart';
 
@@ -58,7 +58,6 @@ class _KlineViewState extends State<KlineView> {
         return _controller.willScroll(offset);
       },
       onChangedScrollOffset: (offset) {
-        // debugPrint('azusa - offset: $offset');
         _controller.scroll(offset);
       },
       child: StreamBuilder(
@@ -79,13 +78,11 @@ class _KlineViewState extends State<KlineView> {
 class KlinePainter extends CustomPainter {
   KlinePainter({required this.data});
 
-  final KlineDrawData data;
+  final KlinePaintData data;
 
   @override
   void paint(Canvas canvas, Size size) {
-    // debugPrint('azusa - paint - ${size.width} - ${data.scrollOffset}');
     data.paint(canvas, size);
-    // canvas.clipRect(Rect.fromLTWH(0, 0, size.width, size.height));
   }
 
   @override

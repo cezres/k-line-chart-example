@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 
-final class KlineLastPainter {
-  KlineLastPainter({
+/// K线最新数据和绘制信息
+class KlineLastPaintData {
+  KlineLastPaintData({
     required this.last,
     required this.y,
   });
 
-  /// 最新的价格
   final double last;
-
-  /// 根据渲染高度和价格值范围，预先计算的Y坐标
   final double y;
 
   /// 缓存，需要在主 Isolate 中执行
@@ -77,7 +75,8 @@ final class KlineLastPainter {
     }
 
     /// 绘制文本背景
-    paint.color = Colors.grey[200]!;
+    paint.color = Colors.grey[300]!;
+    paint.style = PaintingStyle.fill;
     canvas.drawRRect(_textBackgroundRect!, paint);
 
     /// 绘制文本

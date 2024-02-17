@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:gateio_flutter/utils/calculate_interval_of_numbers.dart';
 import 'package:gateio_flutter/widgets/kline/data/kline_data.dart';
+import 'package:gateio_flutter/widgets/kline/paint/configuration.dart';
 
 /// 计算一组K线点数据的最大价格、最小价格、最大成交量
 KlinePointsValueRange calculateValueRangeWithKlinePoints(
@@ -21,15 +23,34 @@ KlinePointsValueRange calculateValueRangeWithKlinePoints(
       minPrice = element.low;
     }
     if (maxVolume < element.baseVolume) {
-      maxVolume = element.baseVolume;
+      maxVolume = element.baseVolume.ceilToDouble();
     }
   }
 
+  final priceInterval = calculateIntervalOfNumbers(
+      maxPrice, minPrice, KlinePaintConfigs.priceSegmentCount, 10);
+  // final volumeInterval = calculateIntervalOfNumbers(
+  //     maxVolume, 0, KlinePaintConfigs.volumeSegmentCount, 60);
+  // final maxVolume = maxVolume.ceilToDouble();
+  final volumeInterval =
+      ((maxVolume / KlinePaintConfigs.volumeSegmentCount) * 100)
+              .ceilToDouble() /
+          100;
+
   return KlinePointsValueRange(
-    maxPrice: maxPrice,
-    minPrice: minPrice,
-    priceRange: maxPrice - minPrice,
+    // maxPrice: maxPrice,
+    // minPrice: minPrice,
+    // priceRange: maxPrice - minPrice,
+    // maxVolume: maxVolume,
+
+    maxPrice: priceInterval.max,
+    minPrice: priceInterval.min,
+    priceRange: priceInterval.max - priceInterval.min,
+    // maxVolume: volumeInterval.max,
+    priceInterval: priceInterval.interval,
+    // volumeInterval: volumeInterval.interval,
     maxVolume: maxVolume,
+    volumeInterval: volumeInterval,
   );
 }
 

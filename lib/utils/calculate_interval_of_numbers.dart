@@ -1,5 +1,6 @@
 import 'dart:math';
 
+/// 计算数值区间
 IntervalOfNumbers calculateIntervalOfNumbers(
     double max, double min, int segmentCount,
     [int x = 10]) {

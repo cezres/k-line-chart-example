@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:gateio_flutter/widgets/kline/data/kline_data.dart';
 import 'package:gateio_flutter/widgets/kline/data_loader/isolated_impl.dart';
-import 'package:gateio_flutter/widgets/kline/data_loader/impl.dart';
+import 'package:gateio_flutter/widgets/kline/data_loader/web_impl.dart';
 
 const kDefaultCurrencyPair = 'BTC_USDT';
 const kDefaultInterval = '1m';
+const kDefaultIntervalValue = 60;
 
 /// K线数据加载器
 /// 将数据加载和解析任务放到独立的 Isolate 中执行
@@ -35,7 +36,7 @@ abstract class KlineDataLoader {
 
   factory KlineDataLoader.auto() {
     if (kIsWeb) {
-      return KlineDataLoaderImpl();
+      return WebKlineDataLoaderImpl();
     } else {
       return IsolatedKLineLoaderImpl();
     }

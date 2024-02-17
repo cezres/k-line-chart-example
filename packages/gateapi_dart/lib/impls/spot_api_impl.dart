@@ -54,3 +54,6 @@ final class SpotApiImpl extends SpotApi {
     });
   }
 }
+
+// https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=BTC_USDT&limit=1000&interval=1m
+// https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=BTC_USDT&interval=1m&to=1708047720&from=1707987780

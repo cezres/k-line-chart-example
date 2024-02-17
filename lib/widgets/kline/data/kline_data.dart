@@ -116,11 +116,15 @@ final class KlinePointsValueRange {
     this.minPrice = 0,
     this.priceRange = 0,
     this.maxVolume = 0,
+    this.priceInterval = 0,
+    this.volumeInterval = 0,
   });
   final double maxPrice; // TODO: remove this
   final double minPrice;
   final double priceRange;
   final double maxVolume;
+  final double priceInterval;
+  final double volumeInterval;
 
   factory KlinePointsValueRange.builder(List<KlinePoint> points, double last) =>
       calculateValueRangeWithKlinePoints(points, last);
@@ -169,22 +173,4 @@ class KlineDataEncoder {
 class KlineDataDecoder {
   KlineDataDecoder(this.data);
   final TransferableTypedData data;
-}
-
-/// K线点数据绘制信息
-class KlinePointDrawData {
-  KlinePointDrawData({
-    required this.yOffset,
-    required this.xDistanceToLatest,
-    required this.indexDistanceToLatest,
-  });
-
-  /// Y 轴偏移量
-  final double yOffset;
-
-  /// X 轴距离最新数据的距离
-  final double xDistanceToLatest;
-
-  /// 索引距离最新数据的距离
-  final int indexDistanceToLatest;
 }
