@@ -1,20 +1,16 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:gateapi_dart/gateapi_dart.dart';
+import 'package:gateapi_dart/types/order_book.dart';
 import 'package:k_line_chart_example/modules/trade/spot/currency_pair/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';
 
-const kTickerRefreshInterval = Duration(seconds: 2);
-
-@riverpod
-class TickerStream extends _$TickerStream {
+@Riverpod()
+class OrderBookStream extends _$OrderBookStream {
   @override
-  Stream<Ticker> build() async* {
-    final pair =
-        ref.watch(currentCurrencyPairProvider.select((value) => value?.id));
+  Stream<OrderBook> build() async* {
+    final pair = ref.watch(currentCurrencyPairProvider);
     if (pair == null) {
       return;
     }
@@ -24,14 +20,16 @@ class TickerStream extends _$TickerStream {
 
     while (!isDisposed) {
       try {
-        final result = await GateApi.spot.tickers(pair);
-        if (result.isNotEmpty) {
-          yield result.first;
-        }
+        yield await GateApi.spot.orderBook(
+          pair.id,
+          interval: '1',
+          limit: 10,
+          withId: true,
+        );
       } catch (e) {
         debugPrint('Error: $e');
       }
-      await Future.delayed(const Duration(milliseconds: 600));
+      await Future.delayed(const Duration(seconds: 1));
     }
   }
 }

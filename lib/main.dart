@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gateio_flutter/modules/home/home_page.dart';
+import 'package:k_line_chart_example/modules/home/home_page.dart';
 
 // flutter run -d chrome --web-renderer skwasm --release
 // flutter run -d chrome --web-renderer canvaskit --release
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'K-Line Chart Example',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

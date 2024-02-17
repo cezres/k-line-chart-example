@@ -2,8 +2,8 @@ import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gateapi_dart/gateapi_dart.dart';
-import 'package:gateio_flutter/modules/trade/spot/ticker/providers.dart';
-import 'package:gateio_flutter/utils/format_decimal.dart';
+import 'package:k_line_chart_example/modules/trade/spot/ticker/providers.dart';
+import 'package:k_line_chart_example/utils/format_decimal.dart';
 
 class TickerView extends ConsumerWidget {
   const TickerView({super.key});

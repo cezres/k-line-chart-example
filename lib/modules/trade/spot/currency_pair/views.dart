@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gateio_flutter/modules/trade/spot/currency_pair/providers.dart';
+import 'package:k_line_chart_example/modules/trade/spot/currency_pair/providers.dart';
 
 class CurrencyPairView extends ConsumerWidget {
   const CurrencyPairView({super.key});

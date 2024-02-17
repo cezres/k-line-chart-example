@@ -1,4 +1,4 @@
-name: gateio_flutter
+name: k_line_chart_example
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -45,7 +45,7 @@ dependencies:
   json_annotation: ^4.8.1
 
   # UI
-  fl_chart: ^0.66.2
+  # fl_chart: ^0.66.2
 
   # Net
   web_socket_channel: ^2.4.0

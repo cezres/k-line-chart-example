@@ -1,67 +1,51 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gateio_flutter/modules/trade/spot/currency_pair/views.dart';
-import 'package:gateio_flutter/modules/trade/spot/order_book/views.dart';
-import 'package:gateio_flutter/modules/trade/spot/ticker/views.dart';
-import 'package:gateio_flutter/widgets/custom_chart/custom_chart.dart';
+import 'package:k_line_chart_example/modules/trade/spot/currency_pair/views.dart';
+import 'package:k_line_chart_example/modules/trade/spot/ticker/views.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/kline_view.dart';
 
 class SpotView extends ConsumerWidget {
   const SpotView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // const kline = CustomChart();
-    // const pair = CurrencyPairView();
-    // const ticker = TickerView();
-    // const depth = OrderBookView();
-
-    final size = MediaQuery.of(context).size;
-
-    if (size.width > 600) {
-      return const Column(
-        children: [
-          // Padding(
-          //   padding: EdgeInsets.only(bottom: 16),
-          //   child: Row(
-          //     children: [
-          //       pair,
-          //       Expanded(
-          //         child: ticker,
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // Expanded(
-          //   child: Row(
-          //     children: [
-          //       Expanded(child: kline),
-          //       Padding(
-          //         padding: EdgeInsets.only(left: 20),
-          //         child: depth,
-          //       ),
-          //     ],
-          //   ),
-          // ),
-        ],
+    if (kIsWeb || Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+      return LayoutBuilder(
+        builder: (context, constraints) => KlineView(
+          currencyPair: 'BTC_USDT',
+          interval: '1m',
+          size: Size(constraints.maxWidth, constraints.maxHeight),
+        ),
       );
     } else {
-      return const Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          CurrencyPairView(),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: TickerView(),
-          ),
-          AspectRatio(
-            aspectRatio: 4 / 3,
-            child: CustomChart(),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 16),
-            child: OrderBookView(),
-          ),
-        ],
+      return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const CurrencyPairView(),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: TickerView(),
+            ),
+            AspectRatio(
+              aspectRatio: 4 / 3,
+              child: LayoutBuilder(
+                builder: (context, constraints) => KlineView(
+                  currencyPair: 'BTC_USDT',
+                  interval: '1m',
+                  size: Size(constraints.maxWidth, constraints.maxHeight),
+                ),
+              ),
+            ),
+            // const Padding(
+            //   padding: EdgeInsets.only(top: 16),
+            //   child: OrderBookView(),
+            // ),
+          ],
+        ),
       );
     }
   }
