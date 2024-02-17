@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gateio_flutter/widgets/kline/data/kline_data.dart';
-import 'package:gateio_flutter/widgets/kline/paint/configuration.dart';
+import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
 
 /// k线右侧价格和成交量标题绘制
 class KlineRightTitlesPaintData {
@@ -24,16 +24,16 @@ class KlineRightTitlesPainter {
   static void paint(
       Canvas canvas, Size size, Paint paint, KlinePointsValueRange range) {
     /// 背景
-    final rect = Rect.fromLTWH(size.width - KlinePaintConfigs.rightTitlesWidth,
-        0, KlinePaintConfigs.rightTitlesWidth, size.height);
+    final rect = Rect.fromLTWH(size.width - KlineConfigs.rightTitlesWidth, 0,
+        KlineConfigs.rightTitlesWidth, size.height);
     paint.color = Colors.white;
     paint.style = PaintingStyle.fill;
     canvas.drawRect(rect, paint);
 
     /// 价格标题
-    final priceHeight = size.height * KlinePaintConfigs.priceHeightRatio;
-    final priceItemHeight = priceHeight / KlinePaintConfigs.priceSegmentCount;
-    for (var i = 1; i < KlinePaintConfigs.priceSegmentCount; i++) {
+    final priceHeight = size.height * KlineConfigs.priceHeightRatio;
+    final priceItemHeight = priceHeight / KlineConfigs.priceSegmentCount;
+    for (var i = 1; i < KlineConfigs.priceSegmentCount; i++) {
       final price = range.maxPrice - range.priceInterval * i;
       final textPainter =
           PaintCaches.putIfAbsent('titles_price_painter_$i', price, () {
@@ -44,7 +44,7 @@ class KlineRightTitlesPainter {
         final textPainter =
             TextPainter(text: textSpan, textDirection: TextDirection.ltr);
         textPainter.layout(
-            minWidth: 0, maxWidth: KlinePaintConfigs.rightTitlesWidth);
+            minWidth: 0, maxWidth: KlineConfigs.rightTitlesWidth);
         return textPainter;
       });
       textPainter.paint(
@@ -57,11 +57,10 @@ class KlineRightTitlesPainter {
     }
 
     /// 成交量标题
-    final volumeHeight = size.height * KlinePaintConfigs.volumeHeightRatio;
-    final volumeItemHeight =
-        volumeHeight / KlinePaintConfigs.volumeSegmentCount;
+    final volumeHeight = size.height * KlineConfigs.volumeHeightRatio;
+    final volumeItemHeight = volumeHeight / KlineConfigs.volumeSegmentCount;
     final volumeBaseY = size.height - volumeHeight;
-    for (var i = 0; i < KlinePaintConfigs.volumeSegmentCount; i++) {
+    for (var i = 0; i < KlineConfigs.volumeSegmentCount; i++) {
       final volume = range.maxVolume - range.volumeInterval * i;
       final textPainter =
           PaintCaches.putIfAbsent('titles_volume_painter_$i', volume, () {
@@ -72,7 +71,7 @@ class KlineRightTitlesPainter {
         final textPainter =
             TextPainter(text: textSpan, textDirection: TextDirection.ltr);
         textPainter.layout(
-            minWidth: 0, maxWidth: KlinePaintConfigs.rightTitlesWidth);
+            minWidth: 0, maxWidth: KlineConfigs.rightTitlesWidth);
         return textPainter;
       });
       textPainter.paint(

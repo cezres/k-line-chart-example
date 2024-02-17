@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// K线图的绘制配置常量
-class KlinePaintConfigs {
+class KlineConfigs {
   /// 右侧标题宽度
   static const double rightTitlesWidth = 60;
 
@@ -23,6 +23,15 @@ class KlinePaintConfigs {
 
   /// 成交量分段数量
   static const int volumeSegmentCount = 6;
+
+  /// 允许右侧滚动超出的的距离
+  static const double rightScrollOffset = 200;
+
+  /// 允许缩放的最小分段宽度
+  static const double minScaleSegmentWidth = 4;
+
+  /// 允许缩放的最大分段宽度
+  static const double maxScaleSegmentWidth = 20;
 
   ///
   ///

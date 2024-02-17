@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gateio_flutter/widgets/kline/calculator/calculator.dart';
 import 'package:gateio_flutter/widgets/kline/data/kline_data.dart';
-import 'package:gateio_flutter/widgets/kline/paint/configuration.dart';
+import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
 import 'package:gateio_flutter/widgets/kline/paint/kline_last_paint_data.dart';
 import 'package:gateio_flutter/widgets/kline/paint/kline_point_paint_data.dart';
 import 'package:gateio_flutter/widgets/kline/paint/right_titles.dart';
@@ -198,6 +198,6 @@ class KlinePaintData {
     KlineRightTitlesPainter.paint(canvas, size, paint, kline.valueRange);
 
     /// 绘制价格和交易量分割线
-    KlinePaintConfigs.paintPriceVolumeDivider(canvas, size, paint);
+    KlineConfigs.paintPriceVolumeDivider(canvas, size, paint);
   }
 }

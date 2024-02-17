@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gateio_flutter/widgets/kline/paint/configuration.dart';
+import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
 
 /// K线最新数据和绘制信息
 class KlineLastPaintData {

@@ -47,8 +47,6 @@ class KlineController {
       _streamController.add(_data);
     });
 
-    debugPrint('${_data.displayOffset} ${_data.displayLimit}');
-
     _loader.request(
       offset: _data.displayOffset,
       limit: _data.displayLimit,
@@ -56,13 +54,6 @@ class KlineController {
       drawHeight: size.height,
       scrollOffset: _data.scrollOffset,
     );
-  }
-
-  bool willScroll(double offset) {
-    if (offset < -200) {
-      return false;
-    }
-    return true;
   }
 
   void scroll(double scrollOffset) {
@@ -82,13 +73,17 @@ class KlineController {
 
   void setSegmentWidth(double width) {
     final newData = _data.copyWithSegmentWidth(width);
+    _request(
+      newData.displayOffset,
+      newData.displayLimit,
+      _data.displayOffset,
+      _data.displayLimit,
+    );
     _data = newData;
     _streamController.add(_data);
   }
 
   void resize(Size size) {
-    debugPrint('azusa - resize - $size');
-    // return;
     final newData = _data.copyWithDrawSize(size.width, size.height);
     _request(
       newData.displayOffset,
@@ -99,6 +94,16 @@ class KlineController {
 
     _data = newData;
     _streamController.add(_data);
+  }
+
+  void refresh() {
+    _loader.request(
+      offset: max(_data.displayOffset, 0),
+      limit: _data.displayLimit,
+      drawWidth: _data.drawWidth,
+      drawHeight: _data.drawHeight,
+      scrollOffset: _data.scrollOffset,
+    );
   }
 
   /// 请求数据

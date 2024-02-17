@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gateio_flutter/widgets/kline/kline_controller.dart';
+import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
 
 class KlineGestureDetector extends StatefulWidget {
   const KlineGestureDetector({
     super.key,
     required this.controller,
     required this.child,
-    required this.willChangeScroll,
-    required this.onChangedScroll,
-    required this.willChangeScale,
-    required this.onChangedScale,
   });
-
-  final bool Function(double offset) willChangeScroll;
-  final bool Function(double scale) willChangeScale;
-  final void Function(double offset) onChangedScroll;
-  final void Function(double scale) onChangedScale;
 
   final KlineController controller;
   final Widget child;
@@ -31,6 +23,13 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
   double? _velocity;
   double _startOffset = 0;
   double _tempScrollOffset = 0;
+
+  double _tempSegmentWidth = 0;
+
+  double get segmentWidth => widget.controller.data.segmentWidth;
+  set segmentWidth(double width) {
+    widget.controller.setSegmentWidth(width);
+  }
 
   double get scrollOffset => widget.controller.data.scrollOffset;
   set scrollOffset(double offset) {
@@ -65,20 +64,17 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        debugPrint('azusa - onTap');
-      },
       onScaleStart: (details) {
-        // debugPrint("${details.pointerCount} - ${details.localFocalPoint.dx}");
         _velocity = null;
         _startOffset = details.localFocalPoint.dx;
         _tempScrollOffset = scrollOffset;
+        _tempSegmentWidth = segmentWidth;
         _controller.stop();
       },
       onScaleUpdate: (details) {
-        debugPrint("${details.pointerCount} - ${details.scale}");
         final offset = details.localFocalPoint.dx - _startOffset;
         setNewScrollOffset(_tempScrollOffset + offset);
+        setNewSegmentWidth(_tempSegmentWidth * details.scale);
       },
       onScaleEnd: (details) {
         _velocity = details.velocity.pixelsPerSecond.dx * 0.8;
@@ -93,11 +89,31 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
   }
 
   bool setNewScrollOffset(double offset) {
-    if (widget.willChangeScroll(offset)) {
+    if (offset > -KlineConfigs.rightScrollOffset) {
       scrollOffset = offset;
-      // widget.onChangedScroll(scrollOffset);
+      return true;
+    } else if (offset != -KlineConfigs.rightScrollOffset) {
+      scrollOffset = -KlineConfigs.rightScrollOffset;
+      return false;
+    } else {
+      return false;
+    }
+  }
+
+  bool setNewSegmentWidth(double width) {
+    if (width > KlineConfigs.maxScaleSegmentWidth) {
+      if (segmentWidth != KlineConfigs.maxScaleSegmentWidth) {
+        segmentWidth = KlineConfigs.maxScaleSegmentWidth;
+      }
+      return false;
+    } else if (width < KlineConfigs.minScaleSegmentWidth) {
+      if (segmentWidth != KlineConfigs.minScaleSegmentWidth) {
+        segmentWidth = KlineConfigs.minScaleSegmentWidth;
+      }
+      return false;
+    } else {
+      segmentWidth = width;
       return true;
     }
-    return false;
   }
 }

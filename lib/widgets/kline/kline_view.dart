@@ -58,19 +58,6 @@ class _KlineViewState extends State<KlineView> {
   Widget build(BuildContext context) {
     return KlineGestureDetector(
       controller: _controller,
-      willChangeScroll: (offset) {
-        return _controller.willScroll(offset);
-      },
-      onChangedScroll: (offset) {
-        _controller.scroll(offset);
-      },
-      willChangeScale: (scale) {
-        // return _controller.willScale(scale);
-        return false;
-      },
-      onChangedScale: (scale) {
-        // _controller.scale(scale);
-      },
       child: RepaintBoundary(
         child: StreamBuilder(
           initialData: _controller.data,

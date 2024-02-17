@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gateio_flutter/utils/calculate_interval_of_numbers.dart';
 import 'package:gateio_flutter/widgets/kline/data/kline_data.dart';
-import 'package:gateio_flutter/widgets/kline/paint/configuration.dart';
+import 'package:gateio_flutter/widgets/kline/kline_configs.dart';
 
 /// 计算一组K线点数据的最大价格、最小价格、最大成交量
 KlinePointsValueRange calculateValueRangeWithKlinePoints(
@@ -28,13 +28,12 @@ KlinePointsValueRange calculateValueRangeWithKlinePoints(
   }
 
   final priceInterval = calculateIntervalOfNumbers(
-      maxPrice, minPrice, KlinePaintConfigs.priceSegmentCount, 10);
+      maxPrice, minPrice, KlineConfigs.priceSegmentCount, 10);
   // final volumeInterval = calculateIntervalOfNumbers(
   //     maxVolume, 0, KlinePaintConfigs.volumeSegmentCount, 60);
   // final maxVolume = maxVolume.ceilToDouble();
   final volumeInterval =
-      ((maxVolume / KlinePaintConfigs.volumeSegmentCount) * 100)
-              .ceilToDouble() /
+      ((maxVolume / KlineConfigs.volumeSegmentCount) * 100).ceilToDouble() /
           100;
 
   return KlinePointsValueRange(
