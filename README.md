@@ -11,7 +11,7 @@ $ flutter pub get
 $ flutter run
 ```
 
-### 截图 (macOS、Web、iOS)
+### 截图
 
 
 macOS|Web|iOS
