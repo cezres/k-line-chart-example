@@ -2,7 +2,7 @@
 
 使用 `CustomPainter` 自绘K线图。
 
-**[K-line Chart Example Web 页面](https://flutter-k-line-chart-example.github.io/)** (由于跨域使用固定时段数据)。
+**[K线 Web 桌面端演示页面](https://flutter-k-line-chart-example.github.io/)** (由于跨域使用固定时段数据)。
 
 ### 如何运行
 
