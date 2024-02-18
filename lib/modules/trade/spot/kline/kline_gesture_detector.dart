@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -69,8 +70,76 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
 
   @override
   Widget build(BuildContext context) {
+    Widget child = widget.child;
+    if (kIsWeb) {
+      child = _listenPointerSignal(child);
+    } else {
+      child = _listenGestureDetector(child);
+    }
+    if (kIsWeb || Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+      child = _listenMouseRegion(child);
+    }
+    return child;
+  }
+
+  int _pointerScrollMode = 0;
+  int _pointerScrollEventTimestamp = 0;
+  int __pointerScrollModeChangeCount = 0;
+
+  Widget _listenPointerSignal(Widget child) {
+    return Listener(
+      onPointerSignal: (event) {
+        if (event is PointerScrollEvent) {
+          /// 当前数据模式
+          final mode =
+              event.scrollDelta.dx.abs() >= event.scrollDelta.dy.abs() ? 1 : 2;
+
+          /// 重置
+          final timestamp = event.timeStamp.inMilliseconds;
+          if (timestamp - _pointerScrollEventTimestamp > 100) {
+            _pointerScrollMode = mode;
+          }
+          _pointerScrollEventTimestamp = timestamp;
+
+          if (_pointerScrollMode != mode) {
+            __pointerScrollModeChangeCount++;
+            if (__pointerScrollModeChangeCount > 3) {
+              _pointerScrollMode = mode;
+              __pointerScrollModeChangeCount = 0;
+            }
+          }
+
+          if (_pointerScrollMode == 1) {
+            setNewScrollOffset(scrollOffset - event.scrollDelta.dx);
+          } else if (_pointerScrollMode == 2) {
+            final width = segmentWidth * (1 - event.scrollDelta.dy / 200);
+            setNewSegmentWidth(width);
+          }
+        }
+      },
+      child: child,
+    );
+  }
+
+  Widget _listenMouseRegion(Widget child) {
+    return MouseRegion(
+      onEnter: (event) {
+        widget.controller.mouse(event.localPosition);
+      },
+      onHover: (event) {
+        widget.controller.mouse(event.localPosition);
+      },
+      onExit: (event) {
+        widget.controller.mouse(const Offset(-1, -1));
+      },
+      child: child,
+    );
+  }
+
+  Widget _listenGestureDetector(Widget child) {
     void Function(TapDownDetails)? onTapDown;
     void Function()? onTapUp;
+
     if (kIsWeb) {
       //
     } else if (Platform.isIOS || Platform.isAndroid) {
@@ -85,63 +154,36 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
       };
     }
 
-    final child = Listener(
-      onPointerSignal: kIsWeb
-          ? (event) {
-              if (event is PointerScrollEvent) {
-                setNewScrollOffset(scrollOffset - event.scrollDelta.dx);
-                debugPrint('scrollDelta: ${event.scrollDelta.dy}');
-              }
-            }
-          : null,
-      child: GestureDetector(
-        onTap: onTapUp,
-        onTapDown: onTapDown,
-        onScaleStart: (details) {
-          _velocity = null;
-          _startOffset = details.localFocalPoint.dx;
-          _tempScrollOffset = scrollOffset;
-          _tempSegmentWidth = segmentWidth;
-          _controller.stop();
-          if (kIsWeb) {
-            //
-          } else if (Platform.isIOS || Platform.isAndroid) {
-            widget.controller.mouse(const Offset(-1, -1));
-          }
-        },
-        onScaleUpdate: (details) {
-          final offset = details.localFocalPoint.dx - _startOffset;
-          setNewScrollOffset(_tempScrollOffset + offset);
-          setNewSegmentWidth(_tempSegmentWidth * details.scale);
-        },
-        onScaleEnd: (details) {
-          _velocity = details.velocity.pixelsPerSecond.dx * 0.8;
-          if (_velocity != 0) {
-            _tempScrollOffset = scrollOffset;
-            _controller.reset();
-            _controller.animateTo(1, curve: Curves.easeOut);
-          }
-        },
-        child: widget.child,
-      ),
-    );
-
-    if (kIsWeb || Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
-      return MouseRegion(
-        onEnter: (event) {
-          widget.controller.mouse(event.localPosition);
-        },
-        onHover: (event) {
-          widget.controller.mouse(event.localPosition);
-        },
-        onExit: (event) {
+    return GestureDetector(
+      onTap: onTapUp,
+      onTapDown: onTapDown,
+      onScaleStart: (details) {
+        _velocity = null;
+        _startOffset = details.localFocalPoint.dx;
+        _tempScrollOffset = scrollOffset;
+        _tempSegmentWidth = segmentWidth;
+        _controller.stop();
+        if (kIsWeb) {
+          //
+        } else if (Platform.isIOS || Platform.isAndroid) {
           widget.controller.mouse(const Offset(-1, -1));
-        },
-        child: child,
-      );
-    } else {
-      return child;
-    }
+        }
+      },
+      onScaleUpdate: (details) {
+        final offset = details.localFocalPoint.dx - _startOffset;
+        setNewScrollOffset(_tempScrollOffset + offset);
+        setNewSegmentWidth(_tempSegmentWidth * details.scale);
+      },
+      onScaleEnd: (details) {
+        _velocity = details.velocity.pixelsPerSecond.dx * 0.8;
+        if (_velocity != 0) {
+          _tempScrollOffset = scrollOffset;
+          _controller.reset();
+          _controller.animateTo(1, curve: Curves.easeOut);
+        }
+      },
+      child: widget.child,
+    );
   }
 
   bool setNewScrollOffset(double offset) {

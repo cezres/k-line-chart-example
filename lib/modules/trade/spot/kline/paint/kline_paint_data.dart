@@ -96,10 +96,18 @@ class KlinePaintData {
     );
   }
 
-  KlinePaintData copyWithSegmentWidth(double segmentWidth) {
+  KlinePaintData copyWithSegmentWidth(double newSegmentWidth) {
+    final double newScrollOffset;
+    if (scrollOffset > 0) {
+      final indexOffset = (scrollOffset / segmentWidth);
+      newScrollOffset = indexOffset * newSegmentWidth;
+    } else {
+      newScrollOffset = scrollOffset;
+    }
+
     return copyWith(
-      segmentWidth: segmentWidth,
-      // displayOffset: calculateDisplayPointsOffset(segmentWidth, scrollOffset),
+      scrollOffset: newScrollOffset,
+      segmentWidth: newSegmentWidth,
       displayLimit: calculateDisplayPointsLimit(segmentWidth, drawWidth),
     ).rebuildPointsAndLast();
   }

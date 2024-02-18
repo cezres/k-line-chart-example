@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:gateapi_dart/gateapi_dart.dart';
@@ -28,7 +29,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
     required double drawHeight,
     required double scrollOffset,
   }) {
-    _calculateKlineData(offset: offset, limit: limit);
+    _calculateKlineData(offset: max(offset, 0), limit: limit);
   }
 
   final _controller = StreamController<KlineData>.broadcast();

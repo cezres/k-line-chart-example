@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/kline_configs.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_last_paint_data.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_paint_data.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/data_loader/data_loader.dart';
@@ -38,7 +39,7 @@ class KlineController {
       kline: _loader.data,
       drawWidth: size.width,
       drawHeight: size.height,
-      scrollOffset: 0,
+      scrollOffset: -KlineConfigs.rightScrollOffset,
       segmentWidth: 8,
       points: [],
       last: KlineLastPaintData(last: 0, y: 0, isRise: false),
