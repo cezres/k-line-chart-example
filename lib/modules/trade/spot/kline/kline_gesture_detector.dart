@@ -82,17 +82,18 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
     return child;
   }
 
-  int _pointerScrollMode = 0;
+  PointerScrollMode _pointerScrollMode = PointerScrollMode.none;
   int _pointerScrollEventTimestamp = 0;
-  int __pointerScrollModeChangeCount = 0;
+  int _pointerScrollModeChangeCount = 0;
 
   Widget _listenPointerSignal(Widget child) {
     return Listener(
       onPointerSignal: (event) {
         if (event is PointerScrollEvent) {
           /// 当前数据模式
-          final mode =
-              event.scrollDelta.dx.abs() >= event.scrollDelta.dy.abs() ? 1 : 2;
+          final mode = event.scrollDelta.dx.abs() >= event.scrollDelta.dy.abs()
+              ? PointerScrollMode.scroll
+              : PointerScrollMode.scale;
 
           /// 重置
           final timestamp = event.timeStamp.inMilliseconds;
@@ -102,16 +103,16 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
           _pointerScrollEventTimestamp = timestamp;
 
           if (_pointerScrollMode != mode) {
-            __pointerScrollModeChangeCount++;
-            if (__pointerScrollModeChangeCount > 3) {
+            _pointerScrollModeChangeCount++;
+            if (_pointerScrollModeChangeCount > 3) {
               _pointerScrollMode = mode;
-              __pointerScrollModeChangeCount = 0;
+              _pointerScrollModeChangeCount = 0;
             }
           }
 
-          if (_pointerScrollMode == 1) {
+          if (_pointerScrollMode == PointerScrollMode.scroll) {
             setNewScrollOffset(scrollOffset - event.scrollDelta.dx);
-          } else if (_pointerScrollMode == 2) {
+          } else if (_pointerScrollMode == PointerScrollMode.scale) {
             final width = segmentWidth * (1 - event.scrollDelta.dy / 200);
             setNewSegmentWidth(width);
           }
@@ -214,4 +215,10 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
       return true;
     }
   }
+}
+
+enum PointerScrollMode {
+  none,
+  scroll,
+  scale,
 }
