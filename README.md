@@ -14,7 +14,7 @@ $ flutter run
 ### 截图 (macOS、Web、iOS)
 
 
-1|2|3
--|:-|:-
+macOS|Web|iOS
+:-|:-|:-
 ![img](https://github.com/cezres/K-line-chart-example/blob/main/assets/desktop.png) | ![img](https://github.com/cezres/K-line-chart-example/blob/main/assets/web.png) | ![img](https://github.com/cezres/K-line-chart-example/blob/main/assets/mobile.png)
 
