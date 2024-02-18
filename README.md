@@ -23,7 +23,7 @@ macOS|Web|iOS
 -----
 
 
-**在后台执行计算任务并大量传递数据时，复用 Isolate 并使用 TransferableTypedData 传递数据会有更好的性能**，[测试方法](https://github.com/cezres/k-line-chart-example/blob/main/test/widget_test.dart#L19)。
+**在后台高频执行计算任务并大量传递数据时，复用 Isolate 并使用 TransferableTypedData 传递数据会有更好的性能，[测试方法](https://github.com/cezres/k-line-chart-example/blob/main/test/widget_test.dart#L19)。**
 
 
 
