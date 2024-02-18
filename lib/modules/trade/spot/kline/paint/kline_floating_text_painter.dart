@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/kline_configs.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_paint_data.dart';
@@ -5,29 +8,6 @@ import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_paint_
 class KlineFloatingTextPainter {
   static void paint(
       Canvas canvas, Size size, Paint paint, KlinePaintData data) {
-    PaintCaches.paintText(
-      canvas: canvas,
-      paint: paint,
-      key: 'floating_text_volume_title',
-      text: 'Volume',
-      offset: Offset(20, size.height * (1 - KlineConfigs.volumeHeightRatio)),
-      style: const TextStyle(color: Colors.grey, fontSize: 12),
-    );
-
-    PaintCaches.paintText(
-      canvas: canvas,
-      paint: paint,
-      key: 'floating_text_price_title',
-      text:
-          'Open:                High:                 low:                 Close:',
-      offset: const Offset(10, 20),
-      style: const TextStyle(
-        color: Colors.grey,
-        fontSize: 12,
-        fontFeatures: [FontFeature.tabularFigures()],
-      ),
-    );
-
     var point = data.kline.last;
     if (data.mousePositionX > 0 &&
         data.mousePositionX < size.width - KlineConfigs.rightTitlesWidth) {
@@ -35,9 +15,51 @@ class KlineFloatingTextPainter {
       if (distanceX >= 0) {
         final index =
             data.points.indexWhere((element) => element.distanceX < distanceX);
-        point = data.kline.points[index];
+        if (index >= 0) {
+          point = data.kline.points[index];
+        }
       }
     }
+
+    final double fontSize;
+    final double titleOffset;
+    final double valueOffset;
+    final String priceTitle;
+    final String priceValue;
+    final String volumeValue;
+
+    if (kIsWeb || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      titleOffset = 20;
+      valueOffset = 56;
+      fontSize = 12;
+      priceTitle =
+          'Open:                High:                 Low:                 Close:';
+      priceValue =
+          '${point.open.toStringAsFixed(1)}           ${point.high.toStringAsFixed(1)}         ${point.low.toStringAsFixed(1)}             ${point.close.toStringAsFixed(1)}';
+      volumeValue = '    ${point.baseVolume}';
+    } else {
+      titleOffset = 12;
+      valueOffset = 30;
+      fontSize = 10;
+      priceTitle =
+          'Open:                High:                 Low:                 Close:';
+      priceValue =
+          '  ${point.open.toStringAsFixed(1)}           ${point.high.toStringAsFixed(1)}         ${point.low.toStringAsFixed(1)}             ${point.close.toStringAsFixed(1)}';
+      volumeValue = '     ${point.baseVolume}';
+    }
+
+    PaintCaches.paintText(
+      canvas: canvas,
+      paint: paint,
+      key: 'floating_text_price_title',
+      text: priceTitle,
+      offset: Offset(titleOffset, 0),
+      style: TextStyle(
+        color: Colors.grey,
+        fontSize: fontSize,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      ),
+    );
 
     final color = point.close > point.open
         ? KlineConfigs.riseColor
@@ -47,12 +69,11 @@ class KlineFloatingTextPainter {
       canvas: canvas,
       paint: paint,
       key: 'floating_text_price_value',
-      text:
-          '${point.open.toStringAsFixed(1)}           ${point.high.toStringAsFixed(1)}         ${point.low.toStringAsFixed(1)}             ${point.close.toStringAsFixed(1)}',
-      offset: const Offset(10 + 34, 20),
+      text: priceValue,
+      offset: Offset(valueOffset, 0),
       style: TextStyle(
         color: color,
-        fontSize: 12,
+        fontSize: fontSize,
         fontFeatures: const [FontFeature.tabularFigures()],
       ),
     );
@@ -60,13 +81,23 @@ class KlineFloatingTextPainter {
     PaintCaches.paintText(
       canvas: canvas,
       paint: paint,
+      key: 'floating_text_volume_title',
+      text: 'Volume:',
+      offset: Offset(
+          titleOffset, size.height * (1 - KlineConfigs.volumeHeightRatio)),
+      style: TextStyle(color: Colors.grey, fontSize: fontSize),
+    );
+
+    PaintCaches.paintText(
+      canvas: canvas,
+      paint: paint,
       key: 'floating_text_volume_value',
-      text: point.baseVolume.toString(),
-      offset:
-          Offset(20 + 46, size.height * (1 - KlineConfigs.volumeHeightRatio)),
+      text: volumeValue,
+      offset: Offset(
+          valueOffset, size.height * (1 - KlineConfigs.volumeHeightRatio)),
       style: TextStyle(
         color: color,
-        fontSize: 12,
+        fontSize: fontSize,
         fontFeatures: const [FontFeature.tabularFigures()],
       ),
     );

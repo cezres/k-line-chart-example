@@ -40,11 +40,28 @@ class KlinePointPaintData {
         : KlineConfigs.fallColor;
 
     paint.strokeWidth = segmentWidth - 1;
-    canvas.drawLine(
-      Offset(x, openPriceY),
-      Offset(x, closePriceY),
-      paint,
-    );
+    final openCloseAbs = (openPriceY - closePriceY).abs();
+    if (openCloseAbs < 1) {
+      if (closePriceY > openPriceY) {
+        canvas.drawLine(
+          Offset(x, openPriceY),
+          Offset(x, openPriceY + 1),
+          paint,
+        );
+      } else {
+        canvas.drawLine(
+          Offset(x, closePriceY),
+          Offset(x, closePriceY - 1),
+          paint,
+        );
+      }
+    } else {
+      canvas.drawLine(
+        Offset(x, openPriceY),
+        Offset(x, closePriceY),
+        paint,
+      );
+    }
 
     paint.strokeWidth = 1;
     canvas.drawLine(

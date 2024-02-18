@@ -92,7 +92,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
             limit: 1000,
           );
           appendLastPoints(datas);
-          return;
+          // return;
         } else {
           /// 增量加载最新的数据
           final last = _totalPoints.last.timestamp;

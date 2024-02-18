@@ -31,7 +31,7 @@ class SpotView extends ConsumerWidget {
               child: TickerView(),
             ),
             AspectRatio(
-              aspectRatio: 4 / 3,
+              aspectRatio: 3 / 4,
               child: LayoutBuilder(
                 builder: (context, constraints) => KlineView(
                   currencyPair: 'BTC_USDT',
