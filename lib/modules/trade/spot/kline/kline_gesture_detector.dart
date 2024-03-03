@@ -218,14 +218,15 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector> with Ticker
   }
 
   bool setNewScrollOffset(double offset) {
-    if (offset > -KlineConfigs.rightScrollOffset) {
-      scrollOffset = offset;
-      return true;
-    } else if (offset != -KlineConfigs.rightScrollOffset) {
+    if (offset < -KlineConfigs.rightScrollOffset) {
       scrollOffset = -KlineConfigs.rightScrollOffset;
       return false;
-    } else {
+    } else if (offset > widget.controller.data.maxScrollOffset) {
+      scrollOffset = widget.controller.data.maxScrollOffset;
       return false;
+    } else {
+      scrollOffset = offset;
+      return true;
     }
   }
 

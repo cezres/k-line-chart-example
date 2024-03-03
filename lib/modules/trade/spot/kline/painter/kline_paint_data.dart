@@ -21,6 +21,7 @@ class KlinePaintData {
     required this.last,
     this.mousePositionX = 0,
     this.mousePositionY = 0,
+    this.maxScrollOffset = 0,
   })  : displayOffset = displayOffset ??
             calculateDisplayPointsOffset(
               segmentWidth,
@@ -54,6 +55,9 @@ class KlinePaintData {
   final double mousePositionX;
   final double mousePositionY;
 
+  /// 根据已加载的数据总量，计算可向左滑动的最大偏移量
+  final double maxScrollOffset;
+
   KlinePaintData copyWith({
     KlineData? kline,
     int? displayOffset,
@@ -66,6 +70,7 @@ class KlinePaintData {
     KlineLastPaintData? last,
     double? mousePositionX,
     double? mousePositionY,
+    double? maxScrollOffset,
   }) {
     return KlinePaintData(
       kline: kline ?? this.kline,
@@ -79,6 +84,7 @@ class KlinePaintData {
       last: last ?? this.last,
       mousePositionX: mousePositionX ?? this.mousePositionX,
       mousePositionY: mousePositionY ?? this.mousePositionY,
+      maxScrollOffset: maxScrollOffset ?? this.maxScrollOffset,
     );
   }
 
@@ -86,7 +92,10 @@ class KlinePaintData {
     if (kline.points.isEmpty) {
       return this;
     }
-    return copyWith(kline: kline).rebuildPointsAndLast();
+    return copyWith(
+      kline: kline,
+      maxScrollOffset: ((kline.total - displayLimit / 2) * segmentWidth),
+    ).rebuildPointsAndLast();
   }
 
   KlinePaintData copyWithScrollOffset(double scrollOffset) {
@@ -109,7 +118,11 @@ class KlinePaintData {
       scrollOffset: newScrollOffset,
       segmentWidth: newSegmentWidth,
       displayLimit: calculateDisplayPointsLimit(newSegmentWidth, drawWidth),
-    ).rebuildPointsAndLast();
+      points: points.map((e) {
+        return e.copyWith(distanceX: e.distance * newSegmentWidth);
+      }).toList(),
+      maxScrollOffset: ((kline.total - displayLimit / 2) * segmentWidth),
+    );
   }
 
   KlinePaintData copyWithDrawSize(double drawWidth, double drawHeight) {
@@ -156,6 +169,7 @@ class KlinePaintData {
     final List<KlinePointPaintData> list = [];
     for (var i = 0; i < points.length; i++) {
       final distanceIndex = distance - i;
+      final distanceX = segmentWidth * distanceIndex;
 
       final point = points[i];
       final openY = drawHeight - (priceBaseY + (point.open - minPrice) * priceYScale);
@@ -165,8 +179,8 @@ class KlinePaintData {
       final volumeY = drawHeight - point.baseVolume * volumeScale;
 
       list.add(KlinePointPaintData(
-        distance: distanceIndex - i,
-        distanceX: segmentWidth * distanceIndex,
+        distance: distanceIndex,
+        distanceX: distanceX,
         openPriceY: openY,
         closePriceY: closeY,
         lowPriceY: lowY,

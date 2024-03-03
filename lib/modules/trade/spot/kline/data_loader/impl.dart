@@ -57,6 +57,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
           baseVolume: 0,
           isClose: false,
         ),
+        total: _totalPoints.length,
       );
       return;
     }
@@ -78,6 +79,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
       points: points,
       valueRange: KlinePointsValueRange.builder(points),
       last: last,
+      total: _totalPoints.length,
     );
     _controller.add(_data);
   }

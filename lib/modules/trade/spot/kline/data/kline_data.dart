@@ -11,6 +11,7 @@ final class KlineData {
     required this.points,
     required this.last,
     required this.valueRange,
+    required this.total,
   });
 
   factory KlineData.empty() {
@@ -31,6 +32,7 @@ final class KlineData {
         isClose: false,
       ),
       valueRange: const KlinePointsValueRange(),
+      total: 0,
     );
   }
 
@@ -49,6 +51,9 @@ final class KlineData {
 
   /// K线数据的值范围
   final KlinePointsValueRange valueRange;
+
+  /// 已加载的总数量
+  final int total;
 }
 
 /// K线数据
@@ -116,8 +121,7 @@ final class KlinePointsValueRange {
   final double priceInterval;
   final double volumeInterval;
 
-  factory KlinePointsValueRange.builder(List<KlinePoint> points) =>
-      calculateValueRangeWithKlinePoints(points);
+  factory KlinePointsValueRange.builder(List<KlinePoint> points) => calculateValueRangeWithKlinePoints(points);
 }
 
 /// K线数据范围
@@ -136,8 +140,8 @@ final class KlinePointRange {
     final int otherEnd = other.offset + other.limit;
 
     // 判断一个范围的起始位置是否在另一个范围之内
-    bool isStartInside = (other.offset >= offset && other.offset < end) ||
-        (offset >= other.offset && offset < otherEnd);
+    bool isStartInside =
+        (other.offset >= offset && other.offset < end) || (offset >= other.offset && offset < otherEnd);
 
     // 特殊情况处理：当 offset 为 0 时，需要特别判断
     if (offset == 0 || other.offset == 0) {
