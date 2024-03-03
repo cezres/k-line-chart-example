@@ -104,6 +104,10 @@ class KlinePaintData {
 
   KlinePaintData copyWithKlinePaintData(KlinePaintData data) {
     var result = copyWith(
+      kline: data.kline,
+      points: data.points,
+      last: data.last,
+      maxScrollOffset: data.maxScrollOffset,
     );
     if (result.segmentWidth != data.segmentWidth) {
       result = result.copyWithSegmentWidth(data.segmentWidth);
@@ -113,6 +117,8 @@ class KlinePaintData {
     }
     if (mousePositionX > 0) {
       result = result.copyWith(
+        lastPoint: _rebuildLastPoint(
+          kline: kline,
           mouseX: mousePositionX,
           scrollOffset: scrollOffset,
           drawWidth: drawWidth,
