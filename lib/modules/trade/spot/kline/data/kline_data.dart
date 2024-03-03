@@ -58,7 +58,7 @@ final class KlineData {
 
 /// K线数据
 final class KlinePoint {
-  KlinePoint({
+  const KlinePoint({
     required this.timestamp,
     required this.quoteVolume,
     required this.close,

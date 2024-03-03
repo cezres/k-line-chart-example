@@ -183,7 +183,7 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector> with Ticker
         if (_pointerScrollMode == PointerScrollMode.none) {
           /// 当前数据模式
           if (Platform.isIOS || Platform.isAndroid) {
-            _pointerScrollMode = details.verticalScale == 1 ? PointerScrollMode.scroll : PointerScrollMode.scale;
+            _pointerScrollMode = details.scale == 1 ? PointerScrollMode.scroll : PointerScrollMode.scale;
           } else {
             final mode = dx.abs() >= dy.abs() ? PointerScrollMode.scroll : PointerScrollMode.scale;
             _pointerScrollMode = mode;
@@ -192,7 +192,7 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector> with Ticker
 
         if (Platform.isIOS || Platform.isAndroid) {
           if (_pointerScrollMode == PointerScrollMode.scale) {
-            setNewSegmentWidth(_tempSegmentWidth * details.verticalScale);
+            setNewSegmentWidth(_tempSegmentWidth * details.scale);
           } else {
             setNewScrollOffset(_tempScrollOffset + dx);
           }

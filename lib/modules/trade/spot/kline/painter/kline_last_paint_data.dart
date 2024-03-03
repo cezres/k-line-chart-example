@@ -24,7 +24,7 @@ class KlineLastPaintData {
       key: 'last_line_text',
       text: last.toStringAsFixed(1),
       offset: Offset(
-        size.width * 0.25,
+        size.width * 0.55,
         y,
       ),
       style: const TextStyle(color: Colors.black, fontSize: 12),

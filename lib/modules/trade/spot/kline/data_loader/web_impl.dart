@@ -20,7 +20,7 @@ class WebKlineDataLoaderImpl extends KlineDataLoaderImpl {
       return;
     }
     _loadingFirst = true;
-    if (_index == 2) {
+    if (_index == 7) {
       return;
     }
 
@@ -32,12 +32,9 @@ class WebKlineDataLoaderImpl extends KlineDataLoaderImpl {
   }
 
   Future<List<List<String>>> _loadDatasFromAsset(String key) async {
-    final result =
-        await rootBundle.loadString('assets/candlesticks_$_index.json');
+    final result = await rootBundle.loadString('assets/candlesticks_$_index.json');
     final datas = json.decode(result);
 
-    return (datas as List)
-        .map((e) => (e as List).map((e) => e.toString()).toList())
-        .toList();
+    return (datas as List).map((e) => (e as List).map((e) => e.toString()).toList()).toList();
   }
 }

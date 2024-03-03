@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/data/kline_data.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/data_loader/isolated_impl.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/data_loader/web_impl.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_paint_data.dart';
 
 const kDefaultCurrencyPair = 'BTC_USDT';
 const kDefaultInterval = '1m';
@@ -14,9 +14,9 @@ const kDefaultIntervalValue = 60;
 /// 获取最新的1000条K线数据
 /// 之后持续接收最新的K线数据
 abstract class KlineDataLoader {
-  KlineData get data;
+  KlinePaintData get data;
 
-  Stream<KlineData> get stream;
+  Stream<KlinePaintData> get stream;
 
   /// 请求K线数据
   /// [offset] 请求的起始位置，0表示最新的数据
@@ -30,6 +30,7 @@ abstract class KlineDataLoader {
     required double drawWidth,
     required double drawHeight,
     required double scrollOffset,
+    required double segmentWidth,
   });
 
   KlineDataLoader();
@@ -40,6 +41,7 @@ abstract class KlineDataLoader {
     } else {
       return IsolatedKLineLoaderImpl();
     }
+    // return WebKlineDataLoaderImpl();
   }
 
   void dispose();

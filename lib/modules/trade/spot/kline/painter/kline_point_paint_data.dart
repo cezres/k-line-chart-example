@@ -79,12 +79,14 @@ class KlinePointPaintData {
       );
     }
 
-    paint.strokeWidth = 1;
-    canvas.drawLine(
-      Offset(x, highPriceY),
-      Offset(x, lowPriceY),
-      paint,
-    );
+    if (segmentWidth > 3) {
+      paint.strokeWidth = 1;
+      canvas.drawLine(
+        Offset(x, highPriceY),
+        Offset(x, lowPriceY),
+        paint,
+      );
+    }
 
     paint.color = closePriceY < openPriceY ? KlineConfigs.volumeRiseColor : KlineConfigs.volumeFallColor;
     paint.strokeWidth = segmentWidth - 1;

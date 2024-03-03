@@ -6,6 +6,8 @@ import 'package:gateapi_dart/gateapi_dart.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/calculator/calculator.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/data/kline_data.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/data_loader/data_loader.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_last_paint_data.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_paint_data.dart';
 
 class KlineDataLoaderImpl extends KlineDataLoader {
   KlineDataLoaderImpl() {
@@ -13,10 +15,10 @@ class KlineDataLoaderImpl extends KlineDataLoader {
   }
 
   @override
-  KlineData get data => _data;
+  KlinePaintData get data => _data;
 
   @override
-  Stream<KlineData> get stream => _controller.stream;
+  Stream<KlinePaintData> get stream => _controller.stream;
 
   @override
   void dispose() {}
@@ -28,19 +30,39 @@ class KlineDataLoaderImpl extends KlineDataLoader {
     required double drawWidth,
     required double drawHeight,
     required double scrollOffset,
+    required double segmentWidth,
   }) {
+    if (drawWidth != _data.drawWidth || drawHeight != _data.drawHeight) {
+      _data = _data.copyWithDrawSize(drawWidth, drawHeight);
+    }
+    if (segmentWidth != _data.segmentWidth) {
+      _data = _data.copyWithSegmentWidth(segmentWidth);
+    }
     _calculateKlineData(offset: max(offset, 0), limit: limit);
   }
 
-  final _controller = StreamController<KlineData>.broadcast();
+  final _controller = StreamController<KlinePaintData>.broadcast();
   var _totalPoints = <KlinePoint>[];
-  var _data = KlineData.empty();
+  // var _data = KlineData.empty();
+  var _data = KlinePaintData(
+    kline: KlineData.empty(),
+    drawWidth: 0,
+    drawHeight: 0,
+    scrollOffset: 0,
+    segmentWidth: 8,
+    points: [],
+    last: KlineLastPaintData(last: 0, y: 0, isRise: false),
+  );
+
+  void _setupData(KlineData data) {
+    _data = _data.copyWithKlineData(data);
+  }
 
   /// 根据需求和当前数据计算出需要显示的数据
 
   void _calculateKlineData({required int offset, required int limit}) {
     if (_totalPoints.isEmpty || limit == 0) {
-      _data = KlineData(
+      _setupData(KlineData(
         offset: offset,
         limit: limit,
         currencyPair: kDefaultCurrencyPair,
@@ -58,7 +80,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
           isClose: false,
         ),
         total: _totalPoints.length,
-      );
+      ));
       return;
     }
 
@@ -71,7 +93,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
 
     final points = calculateDisplayPoints(_totalPoints, offset, limit);
     final last = _totalPoints.last;
-    _data = KlineData(
+    _setupData(KlineData(
       offset: offset,
       limit: limit,
       currencyPair: kDefaultCurrencyPair,
@@ -80,7 +102,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
       valueRange: KlinePointsValueRange.builder(points),
       last: last,
       total: _totalPoints.length,
-    );
+    ));
     _controller.add(_data);
   }
 
@@ -109,7 +131,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
       } catch (e) {
         await Future.delayed(const Duration(seconds: 10));
       }
-      await Future.delayed(const Duration(milliseconds: 600));
+      await Future.delayed(const Duration(milliseconds: 400));
     }
   }
 
@@ -173,7 +195,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
       }
     }
 
-    _calculateKlineData(offset: _data.offset, limit: _data.limit);
+    _calculateKlineData(offset: _data.kline.offset, limit: _data.kline.limit);
   }
 
   void appendFirstPoints(List<List<String>> datas) {

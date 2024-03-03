@@ -44,6 +44,7 @@ dependencies:
   decimal: ^2.3.3
   json_annotation: ^4.8.1
   stream_transform: ^2.1.0
+  # window_manager: ^0.3.8
 
   # UI
   # fl_chart: ^0.66.2
@@ -91,6 +92,11 @@ flutter:
     - assets/candlesticks_0.json
     - assets/candlesticks_1.json
     - assets/candlesticks_2.json
+    - assets/candlesticks_3.json
+    - assets/candlesticks_4.json
+    - assets/candlesticks_5.json
+    - assets/candlesticks_6.json
+    - assets/candlesticks_7.json
   
 
   # An image asset can refer to one or more resolution-specific "variants", see

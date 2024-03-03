@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/data/kline_data.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/kline_configs.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_last_paint_data.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_paint_data.dart';
@@ -37,18 +37,19 @@ class KlineController {
 
   void _initialize() {
     _data = KlinePaintData(
-      kline: _loader.data,
+      kline: KlineData.empty(),
       drawWidth: size.width,
       drawHeight: size.height,
       scrollOffset: -KlineConfigs.rightScrollOffset,
       segmentWidth: 8,
       points: [],
       last: KlineLastPaintData(last: 0, y: 0, isRise: false),
-    ).copyWithKlineData(_loader.data);
+    );
 
     _loader.stream.listen((event) {
-      _data = _data.copyWithKlineData(event);
+      _data = _data.copyWithKlinePaintData(event);
       _streamController.add(_data);
+      // debugPrint("KlineController: ${_data.displayLimit} - ${_data.kline.points.length}");
     });
 
     _loader.request(
@@ -57,15 +58,17 @@ class KlineController {
       drawWidth: size.width,
       drawHeight: size.height,
       scrollOffset: _data.scrollOffset,
+      segmentWidth: _data.segmentWidth,
     );
 
-    _requestController.stream.throttle(const Duration(milliseconds: 100)).listen((event) {
+    _requestController.stream.throttle(const Duration(milliseconds: 100), trailing: true).listen((event) {
       _loader.request(
         offset: event.$1,
         limit: event.$2,
-        drawWidth: size.width,
-        drawHeight: size.height,
+        drawWidth: _data.drawWidth,
+        drawHeight: _data.drawHeight,
         scrollOffset: _data.scrollOffset,
+        segmentWidth: _data.segmentWidth,
       );
     });
   }
@@ -86,8 +89,6 @@ class KlineController {
   }
 
   void setSegmentWidth(double width) {
-    debugPrint("setSegmentWidth: $width");
-
     final newData = _data.copyWithSegmentWidth(width);
     _request(
       newData.displayOffset,
@@ -118,16 +119,6 @@ class KlineController {
     _streamController.add(_data);
   }
 
-  void refresh() {
-    _loader.request(
-      offset: max(_data.displayOffset, 0),
-      limit: _data.displayLimit,
-      drawWidth: _data.drawWidth,
-      drawHeight: _data.drawHeight,
-      scrollOffset: _data.scrollOffset,
-    );
-  }
-
   final _requestController = StreamController<(int, int)>();
 
   /// 请求数据
@@ -137,7 +128,7 @@ class KlineController {
     if (kIsWeb || Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
       preload = 20;
     } else {
-      preload = 2;
+      preload = 4;
     }
 
     _requestController.add((offset - preload, limit + preload * 2));

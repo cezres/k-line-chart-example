@@ -22,6 +22,16 @@ class KlinePaintData {
     this.mousePositionX = 0,
     this.mousePositionY = 0,
     this.maxScrollOffset = 0,
+    this.lastPoint = const KlinePoint(
+      timestamp: 0,
+      quoteVolume: 0,
+      close: 0,
+      high: 0,
+      low: 0,
+      open: 0,
+      baseVolume: 0,
+      isClose: false,
+    ),
   })  : displayOffset = displayOffset ??
             calculateDisplayPointsOffset(
               segmentWidth,
@@ -58,6 +68,8 @@ class KlinePaintData {
   /// 根据已加载的数据总量，计算可向左滑动的最大偏移量
   final double maxScrollOffset;
 
+  final KlinePoint lastPoint;
+
   KlinePaintData copyWith({
     KlineData? kline,
     int? displayOffset,
@@ -71,6 +83,7 @@ class KlinePaintData {
     double? mousePositionX,
     double? mousePositionY,
     double? maxScrollOffset,
+    KlinePoint? lastPoint,
   }) {
     return KlinePaintData(
       kline: kline ?? this.kline,
@@ -85,12 +98,33 @@ class KlinePaintData {
       mousePositionX: mousePositionX ?? this.mousePositionX,
       mousePositionY: mousePositionY ?? this.mousePositionY,
       maxScrollOffset: maxScrollOffset ?? this.maxScrollOffset,
+      lastPoint: lastPoint ?? this.lastPoint,
     );
+  }
+
+  KlinePaintData copyWithKlinePaintData(KlinePaintData data) {
+    var result = copyWith(
+    );
+    if (result.segmentWidth != data.segmentWidth) {
+      result = result.copyWithSegmentWidth(data.segmentWidth);
+    }
+    if (result.drawWidth != data.drawWidth || result.drawHeight != data.drawHeight) {
+      result = result.copyWithDrawSize(data.drawWidth, data.drawHeight);
+    }
+    if (mousePositionX > 0) {
+      result = result.copyWith(
+          mouseX: mousePositionX,
+          scrollOffset: scrollOffset,
+          drawWidth: drawWidth,
+        ),
+      );
+    }
+    return result;
   }
 
   KlinePaintData copyWithKlineData(KlineData kline) {
     if (kline.points.isEmpty) {
-      return this;
+      return copyWith(kline: kline);
     }
     return copyWith(
       kline: kline,
@@ -102,6 +136,12 @@ class KlinePaintData {
     return copyWith(
       scrollOffset: scrollOffset,
       displayOffset: calculateDisplayPointsOffset(segmentWidth, scrollOffset),
+      lastPoint: _rebuildLastPoint(
+        kline: kline,
+        mouseX: mousePositionX,
+        scrollOffset: scrollOffset,
+        drawWidth: drawWidth,
+      ),
     );
   }
 
@@ -123,6 +163,7 @@ class KlinePaintData {
       }).toList(),
       maxScrollOffset: ((kline.total - displayLimit / 2) * segmentWidth),
     );
+    // TODO: _rebuildLastPoint
   }
 
   KlinePaintData copyWithDrawSize(double drawWidth, double drawHeight) {
@@ -147,7 +188,32 @@ class KlinePaintData {
     return copyWith(
       mousePositionX: x,
       mousePositionY: y,
+      lastPoint: _rebuildLastPoint(
+        kline: kline,
+        mouseX: x,
+        scrollOffset: scrollOffset,
+        drawWidth: drawWidth,
+      ),
     );
+  }
+
+  KlinePoint _rebuildLastPoint({
+    required KlineData kline,
+    required double mouseX,
+    required double scrollOffset,
+    required double drawWidth,
+  }) {
+    var point = kline.last;
+    if (mouseX > 0 && mouseX < drawWidth - KlineConfigs.rightTitlesWidth) {
+      final distanceX = drawWidth - mouseX + scrollOffset;
+      if (distanceX >= 0) {
+        final index = points.indexWhere((element) => element.distanceX < distanceX);
+        if (index >= 0) {
+          point = kline.points[index];
+        }
+      }
+    }
+    return point;
   }
 
   /// 在数据变化时，重新计算对应的绘制数据
@@ -163,8 +229,8 @@ class KlinePaintData {
     final priceHeight = drawHeight * 0.7;
     final priceBaseY = drawHeight * 0.3;
     final priceYScale = priceHeight / kline.valueRange.priceRange;
-    final volumeHeight = drawHeight * 0.25;
-    final volumeScale = volumeHeight / kline.valueRange.maxVolume;
+    final maxVolumeHeight = drawHeight * 0.25;
+    final volumeScale = maxVolumeHeight / kline.valueRange.maxVolume;
 
     final List<KlinePointPaintData> list = [];
     for (var i = 0; i < points.length; i++) {
@@ -176,7 +242,24 @@ class KlinePaintData {
       final closeY = drawHeight - (priceBaseY + (point.close - minPrice) * priceYScale);
       final lowY = drawHeight - (priceBaseY + (point.low - minPrice) * priceYScale);
       final highY = drawHeight - (priceBaseY + (point.high - minPrice) * priceYScale);
-      final volumeY = drawHeight - point.baseVolume * volumeScale;
+      final volumeHeight = point.baseVolume * volumeScale;
+
+      if (volumeHeight > maxVolumeHeight) {
+        debugPrint(
+            'KlinePainter 1: $volumeHeight > $maxVolumeHeight  ${kline.valueRange.maxVolume} ${point.baseVolume} x $drawHeight ${kline.points.length}');
+      }
+
+      if (volumeHeight < 0) {
+        debugPrint(
+            'KlinePainter 2: $volumeHeight > $maxVolumeHeight  ${kline.valueRange.maxVolume} ${point.baseVolume} x $drawHeight ${kline.points.length}');
+      }
+
+      final volumeY = drawHeight - volumeHeight;
+
+      if (volumeY > drawHeight) {
+        debugPrint(
+            'KlinePainter 3: $volumeHeight > $maxVolumeHeight  ${kline.valueRange.maxVolume} ${point.baseVolume} x $drawHeight ${kline.points.length}');
+      }
 
       list.add(KlinePointPaintData(
         distance: distanceIndex,
@@ -220,6 +303,8 @@ class KlinePaintData {
     if (kline.points.isEmpty) {
       return;
     }
+
+    // debugPrint('KlinePainter: $scrollOffset $segmentWidth $displayLimit $maxScrollOffset');
 
     /// 绘制K线点
     for (var element in points) {

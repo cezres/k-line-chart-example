@@ -43,35 +43,35 @@ class KlineFloatingTextPainter {
       volumeValue = '     ${point.baseVolume}';
     }
 
-    PaintCaches.paintText(
-      canvas: canvas,
-      paint: paint,
-      key: 'floating_text_price_title',
-      text: priceTitle,
-      offset: Offset(titleOffset, 0),
-      style: TextStyle(
-        color: Colors.grey,
-        fontSize: fontSize,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      ),
-    );
-
     final color = point.close > point.open ? KlineConfigs.riseColor : KlineConfigs.fallColor;
 
-    PaintCaches.paintText(
-      canvas: canvas,
-      paint: paint,
-      key: 'floating_text_price_value',
-      text: priceValue,
-      offset: Offset(valueOffset, 0),
-      style: TextStyle(
-        color: color,
-        fontSize: fontSize,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      ),
-    );
+    // PaintCaches.paintText(
+    //   canvas: canvas,
+    //   paint: paint,
+    //   key: 'floating_text_price_title',
+    //   text: priceTitle,
+    //   offset: Offset(titleOffset, 0),
+    //   style: TextStyle(
+    //     color: Colors.grey,
+    //     fontSize: fontSize,
+    //     fontFeatures: const [FontFeature.tabularFigures()],
+    //   ),
+    // );
 
-    PaintCaches.paintText(
+    // PaintCaches.paintText(
+    //   canvas: canvas,
+    //   paint: paint,
+    //   key: 'floating_text_price_value',
+    //   text: priceValue,
+    //   offset: Offset(valueOffset, 0),
+    //   style: TextStyle(
+    //     color: color,
+    //     fontSize: fontSize,
+    //     fontFeatures: const [FontFeature.tabularFigures()],
+    //   ),
+    // );
+
+    final rect = PaintCaches.paintText(
       canvas: canvas,
       paint: paint,
       key: 'floating_text_volume_title',
@@ -85,7 +85,8 @@ class KlineFloatingTextPainter {
       paint: paint,
       key: 'floating_text_volume_value',
       text: volumeValue,
-      offset: Offset(valueOffset, size.height * (1 - KlineConfigs.volumeHeightRatio)),
+      // offset: Offset(valueOffset, size.height * (1 - KlineConfigs.volumeHeightRatio)),
+      offset: Offset(rect.right, size.height * (1 - KlineConfigs.volumeHeightRatio)),
       style: TextStyle(
         color: color,
         fontSize: fontSize,

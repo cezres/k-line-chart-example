@@ -6,6 +6,8 @@ import 'package:gateapi_dart/gateapi_dart.dart';
 final _kDio = Dio(
   BaseOptions(
     baseUrl: kBaseURL,
+    connectTimeout: const Duration(seconds: 20),
+    receiveTimeout: const Duration(seconds: 20),
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
