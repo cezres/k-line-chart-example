@@ -5,9 +5,10 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/kline_configs.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_last_paint_data.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_paint_data.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_last_paint_data.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_paint_data.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/data_loader/data_loader.dart';
+import 'package:stream_transform/stream_transform.dart';
 
 class KlineController {
   KlineController({
@@ -57,6 +58,16 @@ class KlineController {
       drawHeight: size.height,
       scrollOffset: _data.scrollOffset,
     );
+
+    _requestController.stream.throttle(const Duration(milliseconds: 100)).listen((event) {
+      _loader.request(
+        offset: event.$1,
+        limit: event.$2,
+        drawWidth: size.width,
+        drawHeight: size.height,
+        scrollOffset: _data.scrollOffset,
+      );
+    });
   }
 
   void scroll(double scrollOffset) {
@@ -75,6 +86,8 @@ class KlineController {
   }
 
   void setSegmentWidth(double width) {
+    debugPrint("setSegmentWidth: $width");
+
     final newData = _data.copyWithSegmentWidth(width);
     _request(
       newData.displayOffset,
@@ -115,6 +128,8 @@ class KlineController {
     );
   }
 
+  final _requestController = StreamController<(int, int)>();
+
   /// 请求数据
   /// 多请求少量数据，以减少数据加载频率
   void _request(int offset, int limit, int oldOffset, int oldLimit) {
@@ -125,16 +140,18 @@ class KlineController {
       preload = 2;
     }
 
-    final offsetAbs = (offset - oldOffset).abs();
-    final limitAbs = (limit - oldLimit).abs();
-    if (offsetAbs < preload / 2 || limitAbs < preload / 2) {
-      _loader.request(
-        offset: max(offset - preload, 0),
-        limit: limit + preload * 2,
-        drawWidth: size.width,
-        drawHeight: size.height,
-        scrollOffset: _data.scrollOffset,
-      );
-    }
+    _requestController.add((offset - preload, limit + preload * 2));
+
+    // final offsetAbs = (offset - oldOffset).abs();
+    // final limitAbs = (limit - oldLimit).abs();
+    // if (offsetAbs < preload / 2 || limitAbs < preload / 2) {
+    //   _loader.request(
+    //     offset: max(offset - preload, 0),
+    //     limit: limit + preload * 2,
+    //     drawWidth: size.width,
+    //     drawHeight: size.height,
+    //     scrollOffset: _data.scrollOffset,
+    //   );
+    // }
   }
 }

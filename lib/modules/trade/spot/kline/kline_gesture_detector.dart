@@ -22,12 +22,11 @@ class KlineGestureDetector extends StatefulWidget {
   State<KlineGestureDetector> createState() => _KlineGestureDetectorState();
 }
 
-class _KlineGestureDetectorState extends State<KlineGestureDetector>
-    with TickerProviderStateMixin {
+class _KlineGestureDetectorState extends State<KlineGestureDetector> with TickerProviderStateMixin {
   late final AnimationController _controller;
 
   double? _velocity;
-  double _startOffset = 0;
+  Offset _startOffset = const Offset(0, 0);
   double _tempScrollOffset = 0;
 
   double _tempSegmentWidth = 0;
@@ -86,36 +85,42 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
   int _pointerScrollEventTimestamp = 0;
   int _pointerScrollModeChangeCount = 0;
 
+  void _handleDesktopScrolll(double dx, double dy, int timeStamp) {
+    /// 当前数据模式
+    final mode = dx.abs() >= dy.abs() ? PointerScrollMode.scroll : PointerScrollMode.scale;
+
+    /// 重置
+    final timestamp = timeStamp;
+    if (timestamp - _pointerScrollEventTimestamp > 100) {
+      _pointerScrollMode = mode;
+    }
+    _pointerScrollEventTimestamp = timestamp;
+
+    if (_pointerScrollMode != mode) {
+      _pointerScrollModeChangeCount++;
+      if (_pointerScrollModeChangeCount > 3) {
+        _pointerScrollMode = mode;
+        _pointerScrollModeChangeCount = 0;
+      }
+    }
+
+    if (_pointerScrollMode == PointerScrollMode.scroll) {
+      setNewScrollOffset(scrollOffset - dx);
+    } else if (_pointerScrollMode == PointerScrollMode.scale) {
+      final width = segmentWidth * (1 - dy / 200);
+      setNewSegmentWidth(width);
+    }
+  }
+
   Widget _listenPointerSignal(Widget child) {
     return Listener(
       onPointerSignal: (event) {
         if (event is PointerScrollEvent) {
-          /// 当前数据模式
-          final mode = event.scrollDelta.dx.abs() >= event.scrollDelta.dy.abs()
-              ? PointerScrollMode.scroll
-              : PointerScrollMode.scale;
-
-          /// 重置
-          final timestamp = event.timeStamp.inMilliseconds;
-          if (timestamp - _pointerScrollEventTimestamp > 100) {
-            _pointerScrollMode = mode;
-          }
-          _pointerScrollEventTimestamp = timestamp;
-
-          if (_pointerScrollMode != mode) {
-            _pointerScrollModeChangeCount++;
-            if (_pointerScrollModeChangeCount > 3) {
-              _pointerScrollMode = mode;
-              _pointerScrollModeChangeCount = 0;
-            }
-          }
-
-          if (_pointerScrollMode == PointerScrollMode.scroll) {
-            setNewScrollOffset(scrollOffset - event.scrollDelta.dx);
-          } else if (_pointerScrollMode == PointerScrollMode.scale) {
-            final width = segmentWidth * (1 - event.scrollDelta.dy / 200);
-            setNewSegmentWidth(width);
-          }
+          _handleDesktopScrolll(
+            event.scrollDelta.dx,
+            event.scrollDelta.dy,
+            event.timeStamp.inMilliseconds,
+          );
         }
       },
       child: child,
@@ -159,8 +164,9 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
       onTap: onTapUp,
       onTapDown: onTapDown,
       onScaleStart: (details) {
+        _pointerScrollMode = PointerScrollMode.none;
         _velocity = null;
-        _startOffset = details.localFocalPoint.dx;
+        _startOffset = details.localFocalPoint;
         _tempScrollOffset = scrollOffset;
         _tempSegmentWidth = segmentWidth;
         _controller.stop();
@@ -171,9 +177,33 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
         }
       },
       onScaleUpdate: (details) {
-        final offset = details.localFocalPoint.dx - _startOffset;
-        setNewScrollOffset(_tempScrollOffset + offset);
-        setNewSegmentWidth(_tempSegmentWidth * details.scale);
+        final dx = details.localFocalPoint.dx - _startOffset.dx;
+        final dy = details.localFocalPoint.dy - _startOffset.dy;
+
+        if (_pointerScrollMode == PointerScrollMode.none) {
+          /// 当前数据模式
+          if (Platform.isIOS || Platform.isAndroid) {
+            _pointerScrollMode = details.verticalScale == 1 ? PointerScrollMode.scroll : PointerScrollMode.scale;
+          } else {
+            final mode = dx.abs() >= dy.abs() ? PointerScrollMode.scroll : PointerScrollMode.scale;
+            _pointerScrollMode = mode;
+          }
+        }
+
+        if (Platform.isIOS || Platform.isAndroid) {
+          if (_pointerScrollMode == PointerScrollMode.scale) {
+            setNewSegmentWidth(_tempSegmentWidth * details.verticalScale);
+          } else {
+            setNewScrollOffset(_tempScrollOffset + dx);
+          }
+        } else {
+          if (_pointerScrollMode == PointerScrollMode.scroll) {
+            setNewScrollOffset(_tempScrollOffset + dx);
+          } else {
+            final width = 10 * (dy / 400);
+            setNewSegmentWidth(_tempSegmentWidth + width);
+          }
+        }
       },
       onScaleEnd: (details) {
         _velocity = details.velocity.pixelsPerSecond.dx * 0.8;
@@ -200,6 +230,7 @@ class _KlineGestureDetectorState extends State<KlineGestureDetector>
   }
 
   bool setNewSegmentWidth(double width) {
+    // debugPrint("setNewSegmentWidth: $width");
     if (width > KlineConfigs.maxScaleSegmentWidth) {
       if (segmentWidth != KlineConfigs.maxScaleSegmentWidth) {
         segmentWidth = KlineConfigs.maxScaleSegmentWidth;

@@ -14,8 +14,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:k_line_chart_example/utils/merge_sorted_arrays.dart';
+import 'package:stream_transform/stream_transform.dart';
 
 void main() {
+  test('stream_transform', () async {
+    final controller = StreamController<int>.broadcast();
+
+    Future.microtask(() async {
+      for (var i = 0; i < 10; i++) {
+        controller.add(i);
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+      controller.close();
+    });
+
+    controller.stream.debounce(const Duration(milliseconds: 200), leading: true).listen((event) {
+      print('debounce: $event');
+    });
+
+    controller.stream.throttle(const Duration(milliseconds: 200), trailing: true).listen((event) {
+      print('throttle: $event');
+    });
+
+    await Future.delayed(const Duration(seconds: 2));
+  });
+
   group('Test performance of Isolate', () {
     const count = 10000;
     final initialValue = List.generate(10000, (index) => index + 1);
@@ -30,10 +53,8 @@ void main() {
         value = await compute(callback, value);
       }
       stopwatch.stop();
-      final result =
-          value.fold(0, (previousValue, element) => previousValue + element);
-      debugPrint(
-          "1. Use compute:\ntime:${stopwatch.elapsedMilliseconds}\tresult:$result");
+      final result = value.fold(0, (previousValue, element) => previousValue + element);
+      debugPrint("1. Use compute:\ntime:${stopwatch.elapsedMilliseconds}\tresult:$result");
     });
 
     test('2. Reuse Isolate and use SendPort to send data', () async {
@@ -73,8 +94,7 @@ void main() {
         index += 1;
       }
       stopwatch.stop();
-      final result =
-          value.fold(0, (previousValue, element) => previousValue + element);
+      final result = value.fold(0, (previousValue, element) => previousValue + element);
       debugPrint(
           "2. Reuse Isolate and use SendPort to send data:\ntime:${stopwatch.elapsedMilliseconds}\tresult:$result");
     });
@@ -95,11 +115,8 @@ void main() {
             if (element == 0) {
               return;
             }
-            sendPort.send(TransferableTypedData.fromList([
-              Uint32List.fromList(callback((element as TransferableTypedData)
-                  .materialize()
-                  .asUint32List()))
-            ]));
+            sendPort.send(TransferableTypedData.fromList(
+                [Uint32List.fromList(callback((element as TransferableTypedData).materialize().asUint32List()))]));
           }
         },
         receivePort.sendPort,
@@ -115,17 +132,14 @@ void main() {
             receivePort.close();
             value = element.materialize().asUint32List();
           } else {
-            sendPort.send(TransferableTypedData.fromList(
-                [element.materialize().asUint32List()]));
+            sendPort.send(TransferableTypedData.fromList([element.materialize().asUint32List()]));
           }
           index += 1;
         }
       }
       stopwatch.stop();
-      final result =
-          value.fold(0, (previousValue, element) => previousValue + element);
-      debugPrint(
-          "3. Send TransferableTypedData:\ntime:${stopwatch.elapsedMilliseconds}\tresult:$result");
+      final result = value.fold(0, (previousValue, element) => previousValue + element);
+      debugPrint("3. Send TransferableTypedData:\ntime:${stopwatch.elapsedMilliseconds}\tresult:$result");
     });
   });
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_paint_data.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_paint_data.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/kline_controller.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/kline_gesture_detector.dart';
 

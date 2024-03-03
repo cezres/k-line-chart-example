@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/calculator/calculator.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/data/kline_data.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/kline_configs.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_floating_text_painter.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_last_paint_data.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_mouse_position_painter.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_point_paint_data.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/paint/right_titles.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_floating_text_painter.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_last_paint_data.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_mouse_position_painter.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_point_paint_data.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/right_titles.dart';
 
 class KlinePaintData {
   KlinePaintData({
@@ -158,14 +158,10 @@ class KlinePaintData {
       final distanceIndex = distance - i;
 
       final point = points[i];
-      final openY =
-          drawHeight - (priceBaseY + (point.open - minPrice) * priceYScale);
-      final closeY =
-          drawHeight - (priceBaseY + (point.close - minPrice) * priceYScale);
-      final lowY =
-          drawHeight - (priceBaseY + (point.low - minPrice) * priceYScale);
-      final highY =
-          drawHeight - (priceBaseY + (point.high - minPrice) * priceYScale);
+      final openY = drawHeight - (priceBaseY + (point.open - minPrice) * priceYScale);
+      final closeY = drawHeight - (priceBaseY + (point.close - minPrice) * priceYScale);
+      final lowY = drawHeight - (priceBaseY + (point.low - minPrice) * priceYScale);
+      final highY = drawHeight - (priceBaseY + (point.high - minPrice) * priceYScale);
       final volumeY = drawHeight - point.baseVolume * volumeScale;
 
       list.add(KlinePointPaintData(

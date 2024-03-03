@@ -15,8 +15,7 @@ class KlineConfigs {
   static const double volumeHeightRatio = 0.25;
 
   /// 价格区域和成交量区域之间的间隔高度比例
-  static double get priceVolumeGapHeightRatio =>
-      1 - priceHeightRatio - volumeHeightRatio;
+  static double get priceVolumeGapHeightRatio => 1 - priceHeightRatio - volumeHeightRatio;
 
   /// 价格区间分段数量
   static const int priceSegmentCount = 10;
@@ -28,7 +27,7 @@ class KlineConfigs {
   static const double rightScrollOffset = 200;
 
   /// 允许缩放的最小分段宽度
-  static const double minScaleSegmentWidth = 4;
+  static const double minScaleSegmentWidth = 2;
 
   /// 允许缩放的最大分段宽度
   static const double maxScaleSegmentWidth = 20;
@@ -44,8 +43,7 @@ class KlineConfigs {
   ///
 
   static void paintPriceVolumeDivider(Canvas canvas, Size size, Paint paint) {
-    final y = size.height *
-        (priceHeightRatio + (1 - priceHeightRatio - volumeHeightRatio) / 2);
+    final y = size.height * (priceHeightRatio + (1 - priceHeightRatio - volumeHeightRatio) / 2);
 
     paint.color = Colors.grey[300]!;
     paint.style = PaintingStyle.stroke;
@@ -81,8 +79,7 @@ class PaintCaches {
   }) {
     final textPainter = putIfAbsent(key, text, () {
       final textSpan = TextSpan(text: text, style: style);
-      final textPainter =
-          TextPainter(text: textSpan, textDirection: TextDirection.ltr);
+      final textPainter = TextPainter(text: textSpan, textDirection: TextDirection.ltr);
       textPainter.layout(minWidth: 0, maxWidth: 400);
       return textPainter;
     });

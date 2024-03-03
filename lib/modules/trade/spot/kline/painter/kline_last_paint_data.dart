@@ -32,16 +32,14 @@ class KlineLastPaintData {
       backgroundRadius: const Radius.circular(4),
     );
 
-    final linePath = PaintCaches.putIfAbsent(
-        'last_line_path', Object.hashAll([y, size.width]), () {
+    final linePath = PaintCaches.putIfAbsent('last_line_path', Object.hashAll([y, size.width]), () {
       const dashWidth = 2.0;
       const dashSpace = 2.0;
       double startX = 0;
 
       final path = Path();
       while (startX < size.width) {
-        if (startX > (rect.left - 4) &&
-            (startX + dashWidth) < (rect.right + 4)) {
+        if (startX > (rect.left - 4) && (startX + dashWidth) < (rect.right + 4)) {
           startX += dashWidth + dashSpace;
           continue;
         }

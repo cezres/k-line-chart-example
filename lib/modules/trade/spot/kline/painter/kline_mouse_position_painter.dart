@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:k_line_chart_example/modules/trade/spot/kline/kline_configs.dart';
-import 'package:k_line_chart_example/modules/trade/spot/kline/paint/kline_paint_data.dart';
+import 'package:k_line_chart_example/modules/trade/spot/kline/painter/kline_paint_data.dart';
 
 class KlineMousePositionPainter {
-  static void paint(
-      Canvas canvas, Size size, Paint paint, KlinePaintData data) {
+  static void paint(Canvas canvas, Size size, Paint paint, KlinePaintData data) {
     if (data.mousePositionX < 10 ||
         data.mousePositionX > size.width - KlineConfigs.rightTitlesWidth ||
         data.mousePositionY < 0 ||
@@ -58,8 +57,7 @@ class KlineMousePositionPainter {
       /// 绘制右侧成交量
       final volumeHeight = size.height * KlineConfigs.volumeHeightRatio;
       if (data.mousePositionY > (size.height - volumeHeight)) {
-        final valueRatio = 1 -
-            (data.mousePositionY - size.height + volumeHeight) / volumeHeight;
+        final valueRatio = 1 - (data.mousePositionY - size.height + volumeHeight) / volumeHeight;
         final volume = valueRatio * valueRange.maxVolume;
         PaintCaches.paintText(
           canvas: canvas,
