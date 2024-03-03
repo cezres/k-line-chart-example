@@ -108,7 +108,7 @@ class KlinePaintData {
     return copyWith(
       scrollOffset: newScrollOffset,
       segmentWidth: newSegmentWidth,
-      displayLimit: calculateDisplayPointsLimit(segmentWidth, drawWidth),
+      displayLimit: calculateDisplayPointsLimit(newSegmentWidth, drawWidth),
     ).rebuildPointsAndLast();
   }
 

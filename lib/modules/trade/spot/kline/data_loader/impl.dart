@@ -135,8 +135,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
       _loadingFirst = false;
     } catch (e) {
       debugPrint('loadFirst error: $e');
-      Future.delayed(const Duration(seconds: 10))
-          .then((value) => _loadingFirst = false);
+      Future.delayed(const Duration(seconds: 10)).then((value) => _loadingFirst = false);
     }
   }
 
@@ -150,8 +149,7 @@ class KlineDataLoaderImpl extends KlineDataLoader {
       _totalPoints = points;
     } else {
       if (points.length == 1) {
-        if (points.last.close == _totalPoints.last.close &&
-            points.last.timestamp == _totalPoints.last.timestamp) {
+        if (points.last.close == _totalPoints.last.close && points.last.timestamp == _totalPoints.last.timestamp) {
           return;
         }
       }
@@ -177,7 +175,6 @@ class KlineDataLoaderImpl extends KlineDataLoader {
   }
 
   void appendFirstPoints(List<List<String>> datas) {
-    _totalPoints =
-        datas.map((e) => KlinePoint.fromList(e)).toList() + _totalPoints;
+    _totalPoints = datas.map((e) => KlinePoint.fromList(e)).toList() + _totalPoints;
   }
 }

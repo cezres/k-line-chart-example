@@ -19,7 +19,6 @@ class KlinePointPaintData {
 
   /// K线点数据距离最新数据的X坐标偏移 distance * segmentWidth
   final double distanceX;
-  // final double x;
 
   final double openPriceY;
   final double closePriceY;
@@ -27,17 +26,34 @@ class KlinePointPaintData {
   final double highPriceY;
   final double volumeY;
 
-  void paint(Canvas canvas, Size size, Paint paint, double segmentWidth,
-      double scrollOffset) {
+  KlinePointPaintData copyWith({
+    int? distance,
+    double? distanceX,
+    double? openPriceY,
+    double? closePriceY,
+    double? lowPriceY,
+    double? highPriceY,
+    double? volumeY,
+  }) {
+    return KlinePointPaintData(
+      distance: distance ?? this.distance,
+      distanceX: distanceX ?? this.distanceX,
+      openPriceY: openPriceY ?? this.openPriceY,
+      closePriceY: closePriceY ?? this.closePriceY,
+      lowPriceY: lowPriceY ?? this.lowPriceY,
+      highPriceY: highPriceY ?? this.highPriceY,
+      volumeY: volumeY ?? this.volumeY,
+    );
+  }
+
+  void paint(Canvas canvas, Size size, Paint paint, double segmentWidth, double scrollOffset) {
     final displayX = size.width - (distanceX - scrollOffset);
     if (displayX > size.width || displayX < -20) {
       return;
     }
 
     final x = displayX - segmentWidth / 2;
-    paint.color = closePriceY < openPriceY
-        ? KlineConfigs.riseColor
-        : KlineConfigs.fallColor;
+    paint.color = closePriceY < openPriceY ? KlineConfigs.riseColor : KlineConfigs.fallColor;
 
     paint.strokeWidth = segmentWidth - 1;
     final openCloseAbs = (openPriceY - closePriceY).abs();
@@ -70,9 +86,7 @@ class KlinePointPaintData {
       paint,
     );
 
-    paint.color = closePriceY < openPriceY
-        ? KlineConfigs.volumeRiseColor
-        : KlineConfigs.volumeFallColor;
+    paint.color = closePriceY < openPriceY ? KlineConfigs.volumeRiseColor : KlineConfigs.volumeFallColor;
     paint.strokeWidth = segmentWidth - 1;
     canvas.drawLine(
       Offset(x, size.height),
